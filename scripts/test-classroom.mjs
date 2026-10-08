@@ -56,6 +56,10 @@ const detail = await request(undefined,teacher,'/api/classroom?student='+alice.i
 assert.equal(detail.attempts.length,5);assert.equal(detail.progress[0].passed,1);
 await request(undefined,a.token,undefined,403,'https://example.com');
 await request({...makeAttempt(true),code:'x'.repeat(20001)},a.token,undefined,400);
+await request({action:'remove-student',studentId:alice.id},a.token,undefined,403);
+await request({action:'remove-student',studentId:alice.id},teacher);
+await request(undefined,teacher,'/api/classroom?student='+alice.id,404);
+assert.equal((await request(undefined,a.token)).profile,null);
 await request({action:'teacher-logout'},teacher);
 assert.equal((await request(undefined,teacher)).isInstructor,false);
 console.log('PASS: signed teacher login; replay rejection; wrong signature rejection; teacher logout; name-only joining; separate students; duplicate-name isolation; concurrent retry deduplication; progress totals; completion retention; presence; private dashboard; code history; invalid requests; CORS.');

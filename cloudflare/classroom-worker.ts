@@ -114,6 +114,20 @@ export class Classroom extends DurableObject<Env> {
           await store.put({ ['student:' + studentId]: profile, ['token:' + tokenHash]: studentId, 'student-count': count + 1 });
           return json({ ok: true, token });
         }
+        if (body.action === 'remove-student') {
+          if (!isTeacher) throw new ApiError('Only Professor Porras can remove practice sessions.', 403);
+          const target = typeof body.studentId === 'string' ? body.studentId : '';
+          if (!/^[a-f0-9-]{36}$/.test(target)) throw new ApiError('Choose a valid practice session.');
+          const profile = await store.get<Student>('student:' + target);
+          if (!profile) throw new ApiError('Student not found.', 404);
+          const keys = ['student:' + target];
+          for (const prefix of [`progress:${target}:`, `attempt:${target}:`]) keys.push(...(await store.list({ prefix })).keys());
+          for (const [key, id] of await store.list<string>({ prefix: 'token:' })) if (id === target) keys.push(key);
+          await store.delete(keys);
+          const activity = await store.get<Partial<Attempt>[]>('activity') || [];
+          await store.put({ 'student-count': Math.max(0, (await store.get<number>('student-count') || 1) - 1), activity: activity.filter(a => a.student_id !== target) });
+          return json({ ok: true });
+        }
         if (!student) throw new ApiError('Join with your first and last name before saving practice.', 401);
         const topic = topics.find(t => t.id === body.topicId);
         if (!topic) throw new ApiError('Choose a valid topic.');
