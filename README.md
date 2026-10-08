@@ -26,3 +26,9 @@ Exercise output and selected assertions are checked in the student's browser. Th
 The Program input field supplies one line per input() call. Files are temporary browser files, not files on a student's computer. PIP and virtual-environment lessons explain local terminal commands; they do not install packages in the portal. The initial Python download requires internet access to cdn.jsdelivr.net.
 
 All 114 reference solutions were run against their expected output and Python assertions. TypeScript and production builds pass. Interactive browser layout and hosted sign-in should also be checked before classroom rollout.
+
+## Public student practice (GitHub Pages)
+
+The additional static practice build uses the same 57 lessons, 114 exercises, and Python worker. It needs no account, database, or server. Student progress and the latest code they ran stay in their own browser; they can download a CSV report for their instructor. Clearing browser data removes local progress. This version does not provide shared class monitoring or cross-device accounts. The existing server-backed classroom implementation remains available separately.
+
+Build with `pnpm build:practice`. Publish the resulting `docs/` folder with GitHub Pages (branch `main`, folder `/docs`) or copy its contents to the root of a `gh-pages` publishing branch. Relative asset and worker URLs support the repository subpath. Students require JavaScript and access to `cdn.jsdelivr.net` for Python.
