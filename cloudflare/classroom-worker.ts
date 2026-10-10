@@ -26,6 +26,10 @@ class ApiError extends Error { constructor(message: string, public status = 400)
 const json = (data: unknown, status = 200) => Response.json(data, { status, headers: { 'Cache-Control': 'no-store' } });
 const digest = async (value: string) => Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(value)))).map(x => x.toString(16).padStart(2, '0')).join('');
 const newToken = () => Array.from(crypto.getRandomValues(new Uint8Array(32))).map(x => x.toString(16).padStart(2, '0')).join('');
+// Names are the only student credential requested for this optional classroom.
+// NFKC and lowercase ensure capitalization and Unicode variants do not create new records.
+const studentName = (first: string, last: string) => `${first.normalize('NFKC').toLocaleLowerCase('en-US')} ${last.normalize('NFKC').toLocaleLowerCase('en-US')}`;
+const profileName = (student: Student) => studentName(student.first_name, student.last_name);
 
 function namePart(value: unknown, label: string) {
   const text = typeof value === 'string' ? value.normalize('NFC').trim().replace(/\s+/g, ' ') : '';
@@ -106,13 +110,103 @@ export class Classroom extends DurableObject<Env> {
         }
         if (body.action === 'join') {
           const first = namePart(body.firstName, 'first name'), last = namePart(body.lastName, 'last name');
-          if (student && student.first_name === first && student.last_name === last) return json({ ok: true });
+          const normalized = studentName(first, last);
+          const nameIndex = 'name:' + await digest(normalized);
+          const indexedId = await store.get<string>(nameIndex);
+          let existing = indexedId ? await store.get<Student>('student:' + indexedId) : undefined;
+          if (existing && profileName(existing) !== normalized) existing = undefined;
+          if (!existing) {
+            // Lazily migrate the existing class so students enrolled before this fix
+            // are recognized without an import, even from another browser/device.
+            const roster = await store.list<Student>({ prefix: 'student:' });
+            const matching = [...roster.values()].filter(p => profileName(p) === normalized);
+            if (matching.length) {
+              matching.sort((a, b) => b.completed - a.completed || b.last_seen - a.last_seen || a.joined_at - b.joined_at);
+              existing = matching[0];
+              if (matching.length > 1) {
+                // Older versions created duplicate profiles for the same name.
+                // Consolidate their saved exercises, attempts and browser tokens.
+                const canonical = existing;
+                const duplicates = matching.slice(1);
+                const merged = new Map<string, Progress>();
+                for (const profile of matching) {
+                  const rows = await store.list<Progress>({ prefix: 'progress:' + profile.id + ':' });
+                  for (const row of rows.values()) {
+                    const prior = merged.get(row.exercise_id);
+                    if (!prior) merged.set(row.exercise_id, { ...row, recentIds: [...(row.recentIds || [])] });
+                    else {
+                      const latest = row.updated_at >= prior.updated_at ? row : prior;
+                      merged.set(row.exercise_id, {
+                        ...latest, passed: Math.max(prior.passed, row.passed),
+                        attempts: prior.attempts + row.attempts,
+                        recentIds: [...new Set([...(prior.recentIds || []), ...(row.recentIds || [])])].slice(-64),
+                      });
+                    }
+                  }
+                }
+                const stats: Student['topicStats'] = {};
+                canonical.started = merged.size;
+                canonical.completed = 0;
+                canonical.needs_help = 0;
+                canonical.attempts = 0;
+                for (const row of merged.values()) {
+                  const current = stats[row.topic_id] || { started: 0, completed: 0 };
+                  current.started++;
+                  current.completed += row.passed ? 1 : 0;
+                  stats[row.topic_id] = current;
+                  canonical.completed += row.passed ? 1 : 0;
+                  canonical.needs_help += !row.passed && row.attempts >= 3 ? 1 : 0;
+                  canonical.attempts += row.attempts;
+                  await store.put(`progress:${canonical.id}:${row.exercise_id}`, row);
+                }
+                canonical.topicStats = stats;
+                const latest = [...matching].sort((a, b) => b.last_seen - a.last_seen)[0];
+                canonical.last_seen = latest.last_seen;
+                canonical.current_topic = latest.current_topic;
+                canonical.joined_at = Math.min(...matching.map(p => p.joined_at));
+                const duplicateIds = new Set(duplicates.map(p => p.id));
+                const oldTokens = await store.list<string>({ prefix: 'token:' });
+                for (const [key, value] of oldTokens) if (duplicateIds.has(value)) await store.put(key, canonical.id);
+                const recentActivity = await store.get<Partial<Attempt>[]>('activity') || [];
+                await store.put('activity', recentActivity.map(a => duplicateIds.has(a.student_id || '') ? { ...a, student_id: canonical.id, name: canonical.name } : a));
+                const obsolete: string[] = [];
+                for (const duplicate of duplicates) {
+                  obsolete.push('student:' + duplicate.id);
+                  const oldProgress = await store.list({ prefix: 'progress:' + duplicate.id + ':' });
+                  obsolete.push(...oldProgress.keys());
+                  const oldAttempts = await store.list<Attempt>({ prefix: 'attempt:' + duplicate.id + ':' });
+                  for (const [key, attempt] of oldAttempts) {
+                    const suffix = key.slice(('attempt:' + duplicate.id + ':').length);
+                    await store.put('attempt:' + canonical.id + ':' + suffix, { ...attempt, student_id: canonical.id, name: canonical.name });
+                    obsolete.push(key);
+                  }
+                }
+                if (obsolete.length) await store.delete(obsolete);
+                await store.put({
+                  ['student:' + canonical.id]: canonical,
+                  'student-count': Math.max(1, (await store.get<number>('student-count') || matching.length) - duplicates.length),
+                });
+                const attempts = await store.list<Attempt>({ prefix: 'attempt:' + canonical.id + ':', reverse: true });
+                const extra = [...attempts.keys()].slice(30);
+                if (extra.length) await store.delete(extra);
+              }
+              await store.put(nameIndex, existing.id);
+            } else if (indexedId) await store.delete(nameIndex);
+          }
+          if (existing) {
+            // Keep every earlier browser token valid; create a new token only for
+            // a new browser so its next visits will also resume the same record.
+            if (student?.id === existing.id) return json({ ok: true, returning: true });
+            const token = newToken();
+            await store.put('token:' + await digest(token), existing.id);
+            return json({ ok: true, token, returning: true });
+          }
           const count = await store.get<number>('student-count') || 0;
-          if (count >= 500) throw new ApiError('This classroom has reached its practice-session limit. Please contact Professor Porras.', 409);
+          if (count >= 500) throw new ApiError('This classroom has reached its student limit. Please contact Professor Porras.', 409);
           const token = newToken(), tokenHash = await digest(token), studentId = crypto.randomUUID(), now = Date.now();
           const profile: Student = { id: studentId, first_name: first, last_name: last, name: `${first} ${last}`, joined_at: now, last_seen: now, current_topic: '', completed: 0, started: 0, attempts: 0, needs_help: 0, topicStats: {} };
-          await store.put({ ['student:' + studentId]: profile, ['token:' + tokenHash]: studentId, 'student-count': count + 1 });
-          return json({ ok: true, token });
+          await store.put({ ['student:' + studentId]: profile, ['token:' + tokenHash]: studentId, [nameIndex]: studentId, 'student-count': count + 1 });
+          return json({ ok: true, token, returning: false });
         }
         if (body.action === 'remove-student') {
           if (!isTeacher) throw new ApiError('Only Professor Porras can remove practice sessions.', 403);
@@ -123,6 +217,8 @@ export class Classroom extends DurableObject<Env> {
           const keys = ['student:' + target];
           for (const prefix of [`progress:${target}:`, `attempt:${target}:`]) keys.push(...(await store.list({ prefix })).keys());
           for (const [key, id] of await store.list<string>({ prefix: 'token:' })) if (id === target) keys.push(key);
+          const nameIndex = 'name:' + await digest(profileName(profile));
+          if (await store.get<string>(nameIndex) === target) keys.push(nameIndex);
           await store.delete(keys);
           const activity = await store.get<Partial<Attempt>[]>('activity') || [];
           await store.put({ 'student-count': Math.max(0, (await store.get<number>('student-count') || 1) - 1), activity: activity.filter(a => a.student_id !== target) });
