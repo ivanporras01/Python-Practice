@@ -44,3 +44,156 @@
 .classroom-entry input:focus { outline: 2px solid #adbc69; outline-offset: 2px; }
 .classroom-entry .form-note { font-size: 12px; margin-top: 20px; }
 @media(max-width:640px) { .classroom-entry { padding: 24px; margin: 16px auto 40px; } }
+
+
+/* Optional black background theme — selected independently in each student's browser. */
+.theme-toggle{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--border);background:var(--card);color:var(--foreground);padding:8px 12px;border-radius:8px;font-family:inherit;font-size:.79rem;font-weight:650;line-height:1.4;white-space:nowrap}
+.theme-toggle:hover{background:var(--secondary);border-color:var(--ring)}
+@media(max-width:600px){.theme-toggle{padding:8px 10px}.theme-toggle span{display:none}}
+:root[data-theme="dark"]{
+color-scheme:dark;
+--background:#090d13;--foreground:#e8eff7;
+--card:#161f2b;--card-foreground:#e8eff7;--popover:#1a2633;--popover-foreground:#e8eff7;
+--primary:#7ed9b0;--primary-foreground:#0b291e;
+--secondary:#253341;--secondary-foreground:#edf4fa;--muted:#25313e;--muted-foreground:#b7c7d3;
+--accent:#254839;--accent-foreground:#e2fae9;
+--border:#344452;--input:#3b5160;--ring:#8fcfb9;
+--sidebar:#0b1420;--sidebar-foreground:#e7f0f5;--sidebar-accent:#263c45;--sidebar-accent-foreground:#fff;--sidebar-border:#314351;
+--green:#8cddb4;--ink:#f1f6fa;--slate:#bdcbd5
+}
+:root[data-theme="dark"] body,
+:root[data-theme="dark"] .portal-main {background:var(--background);color:var(--foreground)}
+:root[data-theme="dark"] .card,
+:root[data-theme="dark"] .topbar,
+:root[data-theme="dark"] .module-heading,
+:root[data-theme="dark"] .search-box,
+:root[data-theme="dark"] .join-dialog,
+:root[data-theme="dark"] .student-sheet [data-slot="sheet-header"],
+:root[data-theme="dark"] .attempt-detail,
+:root[data-theme="dark"] .progress-circle>div,
+:root[data-theme="dark"] .roster-tabs [role="tab"][data-state="active"] {background:var(--card)!important;color:var(--foreground);border-color:var(--border)}
+:root[data-theme="dark"] .student-sheet,
+:root[data-theme="dark"] .module-number,
+:root[data-theme="dark"] .professor-card,
+:root[data-theme="dark"] .practice-callout,
+:root[data-theme="dark"] .how-card,
+:root[data-theme="dark"] .pitfall,
+:root[data-theme="dark"] .expected-output,
+:root[data-theme="dark"] .program-input,
+:root[data-theme="dark"] .save-status,
+:root[data-theme="dark"] .class-invite,
+:root[data-theme="dark"] .roster-footer,
+:root[data-theme="dark"] .roster-card th,
+:root[data-theme="dark"] .student-detail-summary,
+:root[data-theme="dark"] .practice-banner,
+:root[data-theme="dark"] .result-feedback,
+:root[data-theme="dark"] .dashboard-capabilities,
+:root[data-theme="dark"] .gate-icon,
+:root[data-theme="dark"] .dialog-emblem,
+:root[data-theme="dark"] .roster-tabs,
+:root[data-theme="dark"] .exercise-toggle,
+:root[data-theme="dark"] .status-badge,
+:root[data-theme="dark"] .pill.outlined,
+:root[data-theme="dark"] .pill.soft-green,
+:root[data-theme="dark"] .avatar,
+:root[data-theme="dark"] .class-code,
+:root[data-theme="dark"] .lesson-steps li>span,
+:root[data-theme="dark"] .progress-circle [data-slot="progress"],
+:root[data-theme="dark"] .search-box input,
+:root[data-theme="dark"] .program-input textarea {background:#202d39!important;color:var(--foreground)!important;border-color:var(--border)!important}
+:root[data-theme="dark"] .button.secondary,
+:root[data-theme="dark"] .exercise-toggle button.selected,
+:root[data-theme="dark"] .roster-tabs [role="tab"][data-state="active"] {background:#27394a!important;color:#ebf6f4!important;border-color:#496372!important}
+:root[data-theme="dark"] .continue-card {background:#172d3a}
+:root[data-theme="dark"] .topic-row {border-color:var(--border);color:var(--foreground)}
+:root[data-theme="dark"] .topic-row:hover {background:#223343}
+:root[data-theme="dark"] .course-facts,
+:root[data-theme="dark"] .lesson-tabs,
+:root[data-theme="dark"] .unit-tabs,
+:root[data-theme="dark"] .module-heading,
+:root[data-theme="dark"] .site-footer,
+:root[data-theme="dark"] .roster-card th,
+:root[data-theme="dark"] .roster-footer,
+:root[data-theme="dark"] .program-input,
+:root[data-theme="dark"] .save-status {border-color:var(--border)}
+:root[data-theme="dark"] h1,
+:root[data-theme="dark"] h2,
+:root[data-theme="dark"] h3,
+:root[data-theme="dark"] .module-heading h3,
+:root[data-theme="dark"] .topic-title strong,
+:root[data-theme="dark"] .course-facts strong,
+:root[data-theme="dark"] .roster-header h2,
+:root[data-theme="dark"] .student-name strong,
+:root[data-theme="dark"] .dashboard-capabilities h3,
+:root[data-theme="dark"] .professor-card h3,
+:root[data-theme="dark"] .progress-circle strong,
+:root[data-theme="dark"] .metric>strong,
+:root[data-theme="dark"] .breadcrumbs strong,
+:root[data-theme="dark"] .instructor-gate h2,
+:root[data-theme="dark"] .student-sheet [data-slot="sheet-title"],
+:root[data-theme="dark"] .join-dialog [data-slot="dialog-title"] {color:#f0f6fa!important}
+:root[data-theme="dark"] .page-heading p,
+:root[data-theme="dark"] .section-heading p,
+:root[data-theme="dark"] .topic-title>span,
+:root[data-theme="dark"] .topic-status,
+:root[data-theme="dark"] .lesson-intro,
+:root[data-theme="dark"] .lesson-steps p,
+:root[data-theme="dark"] .lesson-meta,
+:root[data-theme="dark"] .exercise-brief>p,
+:root[data-theme="dark"] .metric>div,
+:root[data-theme="dark"] .metric>p,
+:root[data-theme="dark"] .progress-group p,
+:root[data-theme="dark"] .classroom-entry>p,
+:root[data-theme="dark"] .classroom-entry .form-note,
+:root[data-theme="dark"] .professor-card>p,
+:root[data-theme="dark"] .how-card li p,
+:root[data-theme="dark"] .activity-item p,
+:root[data-theme="dark"] .activity-item small,
+:root[data-theme="dark"] .monitor-note,
+:root[data-theme="dark"] .practice-saving-note,
+:root[data-theme="dark"] .reference-note,
+:root[data-theme="dark"] .site-footer,
+:root[data-theme="dark"] .roster-card td,
+:root[data-theme="dark"] .roster-footer,
+:root[data-theme="dark"] .lesson-count,
+:root[data-theme="dark"] .student-sheet [data-slot="sheet-description"],
+:root[data-theme="dark"] .student-detail-summary span,
+:root[data-theme="dark"] .table-progress small,
+:root[data-theme="dark"] .attempt-detail summary small,
+:root[data-theme="dark"] .form-note,
+:root[data-theme="dark"] .muted,
+:root[data-theme="dark"] .eyebrow {color:#b7c7d3!important}
+:root[data-theme="dark"] .lesson-tabs [role="tab"][data-state="active"],
+:root[data-theme="dark"] .unit-tabs [role="tab"][data-state="active"],
+:root[data-theme="dark"] .text-button,
+:root[data-theme="dark"] .topic-row .complete-label,
+:root[data-theme="dark"] .student-name strong:hover {color:#91e7be!important}
+:root[data-theme="dark"] .output-header,
+:root[data-theme="dark"] .console-output,
+:root[data-theme="dark"] .expected-output pre,
+:root[data-theme="dark"] .class-code,
+:root[data-theme="dark"] .student-detail-summary strong,
+:root[data-theme="dark"] .activity-item strong,
+:root[data-theme="dark"] .activity-card h2,
+:root[data-theme="dark"] .attempt-output,
+:root[data-theme="dark"] .attempt-output pre,
+:root[data-theme="dark"] .progress-group>div>strong,
+:root[data-theme="dark"] .professor-card strong,
+:root[data-theme="dark"] .lesson-steps li>span,
+:root[data-theme="dark"] .pitfall strong,
+:root[data-theme="dark"] .pitfall p {color:#d4e8dc!important}
+:root[data-theme="dark"] .classroom-entry input,
+:root[data-theme="dark"] .join-dialog input,
+:root[data-theme="dark"] .search-box input,
+:root[data-theme="dark"] .program-input textarea {background:#101b26!important;color:#eaf3fa!important;border-color:#4b6272!important}
+:root[data-theme="dark"] input::placeholder,
+:root[data-theme="dark"] textarea::placeholder {color:#9dafbb}
+:root[data-theme="dark"] .progress-circle{background:conic-gradient(#6acc9f var(--percent),#314455 0)}
+:root[data-theme="dark"] .hint-button {background:#403525;border-color:#796640;color:#f6d897}
+:root[data-theme="dark"] .hint-text,
+:root[data-theme="dark"] .result-feedback.retry {background:#342c22;color:#f0d495!important;border-color:#71613b}
+:root[data-theme="dark"] .result-feedback strong {color:#adf2c4!important}
+:root[data-theme="dark"] .result-feedback p {color:#c3d8c8!important}
+:root[data-theme="dark"] .code-block,
+:root[data-theme="dark"] .editor-panel {background:#0a1621;color:#e1eef4}
+:root[data-theme="dark"] .theme-toggle {background:#27394a;color:#eaf6f4;border-color:#4a6171}
