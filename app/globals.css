@@ -197,3 +197,8 @@ color-scheme:dark;
 :root[data-theme="dark"] .code-block,
 :root[data-theme="dark"] .editor-panel {background:#0a1621;color:#e1eef4}
 :root[data-theme="dark"] .theme-toggle {background:#27394a;color:#eaf6f4;border-color:#4a6171}
+
+.guided-tutor{margin-top:16px;padding:18px;border:1px solid var(--border,#d9dfeb);border-radius:14px;background:var(--card,#fff)}
+.guided-tutor-title{display:flex;align-items:center;gap:8px;color:var(--foreground,#17233b)}
+.guided-tutor p{margin:10px 0 0;line-height:1.5}
+.guided-tutor-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px}
