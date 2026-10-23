@@ -1,0 +1,716 @@
+{
+  "modules": [
+    "Computational thinking & programming tools",
+    "Variables, user input & numeric expressions",
+    "Character and string data",
+    "Decision control structures",
+    "Repetition control structures",
+    "Structured programming with functions"
+  ],
+  "projects": [
+    {
+      "id": "cafe",
+      "title": "Campus Café Checkout",
+      "short": "Café",
+      "icon": "cafe",
+      "file": "campus_cafe.py",
+      "tag": "Start here",
+      "description": "Turn a café order into an itemized invoice. Explore discounts, tax, and tips.",
+      "focus": "One change can affect several totals.",
+      "params": [
+        {
+          "key": "BURGER_PRICE",
+          "label": "Burger price",
+          "value": 850,
+          "unit": "cents",
+          "min": 0,
+          "max": 100000
+        },
+        {
+          "key": "DRINK_PRICE",
+          "label": "Drink price",
+          "value": 250,
+          "unit": "cents",
+          "min": 0,
+          "max": 100000
+        },
+        {
+          "key": "DESSERT_PRICE",
+          "label": "Dessert price",
+          "value": 400,
+          "unit": "cents",
+          "min": 0,
+          "max": 100000
+        },
+        {
+          "key": "TAX_PERCENT",
+          "label": "Practice tax rate",
+          "value": 7,
+          "unit": "%",
+          "min": 0,
+          "max": 100
+        },
+        {
+          "key": "STUDENT_DISCOUNT_PERCENT",
+          "label": "Student discount",
+          "value": 10,
+          "unit": "%",
+          "min": 0,
+          "max": 100
+        }
+      ],
+      "fields": [
+        {
+          "label": "Customer",
+          "value": "Alex",
+          "kind": "text",
+          "max": 99
+        },
+        {
+          "label": "Burgers",
+          "value": "2",
+          "kind": "number",
+          "max": 99
+        },
+        {
+          "label": "Drinks",
+          "value": "2",
+          "kind": "number",
+          "max": 99
+        },
+        {
+          "label": "Desserts",
+          "value": "1",
+          "kind": "number",
+          "max": 99
+        },
+        {
+          "label": "Student discount?",
+          "value": "yes",
+          "kind": "yesno",
+          "max": 99
+        },
+        {
+          "label": "Tip percentage",
+          "value": "15",
+          "kind": "number",
+          "max": 100
+        }
+      ],
+      "rules": [
+        "Prices are stored in cents: 850 means $8.50. Quantities must be whole numbers from 0 to 99.",
+        "Student orders receive 10% off the subtotal. Other orders receive no discount.",
+        "Both 7% practice tax and the selected tip percentage use the discounted subtotal.",
+        "Round each percentage amount to the nearest cent, half up. Add the rounded tax and tip to the discounted subtotal."
+      ],
+      "formula": "subtotal − discount + tax + tip",
+      "pseudocode": "READ customer\nSET subtotal to 0\nREPEAT for each of 3 menu items\n    READ quantity\n    ADD price × quantity to subtotal\nREAD student status and tip percentage\nIF student, calculate discount\nCALCULATE net, tax, tip, and total\nPRINT the invoice",
+      "walk": [
+        {
+          "module": 1,
+          "title": "Plan before coding",
+          "explanation": "Separate inputs (quantities and status), processing (multiply, discount, add), and output (the invoice). Manually predict one order before running it.",
+          "snippet": "subtotal = 0\n# Add the three item totals before applying a discount."
+        },
+        {
+          "module": 2,
+          "title": "Give values a job",
+          "explanation": "BURGER_PRICE is an integer number of cents. quantity is also an integer; multiplying them gives a line total. Uppercase names mark constants by convention, but Python still lets you change them.",
+          "snippet": "BURGER_PRICE = 850\namount = line_total(price, quantity)"
+        },
+        {
+          "module": 3,
+          "title": "Make the receipt readable",
+          "explanation": "input() returns a string. strip() removes outer spaces; lower() lets YES and yes mean the same thing. An f-string inserts values. :.2f displays two digits after the decimal point.",
+          "snippet": "student = input().strip().lower()\nprint(f\"Customer: {customer}\")"
+        },
+        {
+          "module": 4,
+          "title": "Choose a discount",
+          "explanation": "The condition selects one branch. With a $26.00 subtotal, yes gives a $2.60 discount; no gives $0.00. Changing the discount also changes the tax and tip bases.",
+          "snippet": "if student == \"yes\":\n    discount = percent_of(subtotal, STUDENT_DISCOUNT_PERCENT)\nelse:\n    discount = 0"
+        },
+        {
+          "module": 5,
+          "title": "Repeat without losing the total",
+          "explanation": "range(1, 4) visits 1, 2, 3. subtotal is an accumulator and must start before the loop. The while loop in read_whole repeats until it receives a valid quantity.",
+          "snippet": "for item in range(1, 4):\n    # Select the item, then read its quantity.\n    subtotal = subtotal + amount"
+        },
+        {
+          "module": 6,
+          "title": "Reuse a calculation",
+          "explanation": "price and quantity are parameters in the definition. 850 and 2 are arguments in a call. return gives back 1700 cents. Printing a result and returning it are different actions.",
+          "snippet": "def line_total(price, quantity):\n    return price * quantity\n\namount = line_total(850, 2)"
+        }
+      ],
+      "scenarios": [
+        {
+          "title": "Default order",
+          "values": [
+            "Alex",
+            "2",
+            "2",
+            "1",
+            "yes",
+            "15"
+          ],
+          "inputs": "Alex\n2\n2\n1\nyes\n15",
+          "expected": "CAMPUS CAFE | INVOICE\nCustomer: Alex\nBurger: 2 x $8.50 = $17.00\nDrink: 2 x $2.50 = $5.00\nDessert: 1 x $4.00 = $4.00\nSubtotal: $26.00\nDiscount: -$2.60\nAfter discount: $23.40\nTax: $1.64\nTip: $3.51\nTOTAL: $28.55"
+        },
+        {
+          "title": "No discount",
+          "values": [
+            "Alex",
+            "2",
+            "2",
+            "1",
+            "no",
+            "15"
+          ],
+          "inputs": "Alex\n2\n2\n1\nno\n15",
+          "expected": "CAMPUS CAFE | INVOICE\nCustomer: Alex\nBurger: 2 x $8.50 = $17.00\nDrink: 2 x $2.50 = $5.00\nDessert: 1 x $4.00 = $4.00\nSubtotal: $26.00\nDiscount: -$0.00\nAfter discount: $26.00\nTax: $1.82\nTip: $3.90\nTOTAL: $31.72"
+        },
+        {
+          "title": "Zero tip",
+          "values": [
+            "Alex",
+            "2",
+            "2",
+            "1",
+            "yes",
+            "0"
+          ],
+          "inputs": "Alex\n2\n2\n1\nyes\n0",
+          "expected": "CAMPUS CAFE | INVOICE\nCustomer: Alex\nBurger: 2 x $8.50 = $17.00\nDrink: 2 x $2.50 = $5.00\nDessert: 1 x $4.00 = $4.00\nSubtotal: $26.00\nDiscount: -$2.60\nAfter discount: $23.40\nTax: $1.64\nTip: $0.00\nTOTAL: $25.04"
+        },
+        {
+          "title": "Empty order",
+          "values": [
+            "Alex",
+            "0",
+            "0",
+            "0",
+            "yes",
+            "15"
+          ],
+          "inputs": "Alex\n0\n0\n0\nyes\n15",
+          "expected": "CAMPUS CAFE | INVOICE\nCustomer: Alex\nBurger: 0 x $8.50 = $0.00\nDrink: 0 x $2.50 = $0.00\nDessert: 0 x $4.00 = $0.00\nSubtotal: $0.00\nDiscount: -$0.00\nAfter discount: $0.00\nTax: $0.00\nTip: $0.00\nTOTAL: $0.00"
+        }
+      ],
+      "challenges": [
+        {
+          "title": "1 · Predict the invoice",
+          "task": "Before running the default order, find subtotal, discount, net, tax, tip, and total.",
+          "answer": "Subtotal $26.00; discount $2.60; net $23.40; tax $1.64; tip $3.51; total $28.55."
+        },
+        {
+          "title": "2 · Change a value",
+          "task": "Keep the default input. Change BURGER_PRICE from 850 to 1000 and run again. Explain every changed amount.",
+          "answer": "Subtotal $29.00; discount $2.90; net $26.10; tax $1.83; tip $3.92; total $31.85. Two burgers increase the subtotal by $3.00."
+        },
+        {
+          "title": "3 · Test both branches",
+          "task": "Restore the example. Change the student answer from yes to no.",
+          "answer": "Discount becomes $0.00; tax $1.82; tip $3.90; total $31.72. Tax and tip increase because both use the after-discount amount."
+        },
+        {
+          "title": "4 · Find an accumulator bug",
+          "task": "Temporarily replace subtotal = subtotal + amount with subtotal = amount. Predict the result, then repair it.",
+          "answer": "Only the last line ($4.00 dessert) remains. The incorrect total is $4.39. Put the addition back, and keep subtotal = 0 outside the loop."
+        },
+        {
+          "title": "5 · Test validation and zero",
+          "task": "Run the empty-order scenario. Then use raw input: Alex, -1, 2, 2, 1, yes, 15, one per line. Why is there one extra value?",
+          "answer": "The empty invoice totals $0.00. -1 is rejected; the next 2 replaces the invalid burger quantity. The corrected order totals $28.55. Each retry consumes another input line."
+        },
+        {
+          "title": "6 · Use a function parameter",
+          "task": "Predict line_total(850, 3) and percent_of(2340, 20). Then change the default tip input to 20.",
+          "answer": "The function results are 2550 cents ($25.50) and 468 cents ($4.68). The invoice total with 20% tip is $29.72."
+        }
+      ],
+      "code": "# CAMPUS CAFE CHECKOUT | COP1000-21 | Professor Porras\n# Classroom simulation: prices are cents; percentage rates are whole numbers.\n# Input order: customer, burger qty, drink qty, dessert qty, student yes/no, tip %.\n# Example input: Alex / 2 / 2 / 1 / yes / 15 (one value per line).\n\nBURGER_PRICE = 850\nDRINK_PRICE = 250\nDESSERT_PRICE = 400\nTAX_PERCENT = 7\nSTUDENT_DISCOUNT_PERCENT = 10\n\n# MODULE 6: parameters receive arguments; return sends a result to the caller.\ndef money(cents):\n    return f\"${cents / 100:.2f}\"\n\ndef percent_of(cents, percent):\n    # Whole-cent, half-up rounding for nonnegative amounts: // is floor division.\n    return (cents * percent + 50) // 100\n\ndef line_total(price, quantity):\n    return price * quantity\n\ndef read_whole(label, minimum, maximum):\n    # MODULES 3-5: clean text, make a decision, and repeat invalid input.\n    while True:\n        text = input().strip()\n        if text.isascii() and text.isdigit():\n            value = int(text)\n            if minimum <= value <= maximum:\n                return value\n        print(f\"Invalid {label}. Next input must be {minimum} to {maximum}.\")\n\n# MODULES 1-3: follow the algorithm, store values, and format strings.\ncustomer = input().strip()\nif customer == \"\":\n    customer = \"Guest\"\nsubtotal = 0\nreceipt_lines = \"\"\n\n# MODULE 5: range(1, 4) produces 1, 2, 3. Accumulate all three line totals.\nfor item in range(1, 4):\n    # MODULE 4: choose exactly one name and price for this loop iteration.\n    if item == 1:\n        name = \"Burger\"\n        price = BURGER_PRICE\n    elif item == 2:\n        name = \"Drink\"\n        price = DRINK_PRICE\n    else:\n        name = \"Dessert\"\n        price = DESSERT_PRICE\n    quantity = read_whole(name + \" quantity\", 0, 99)\n    amount = line_total(price, quantity)\n    subtotal = subtotal + amount\n    receipt_lines = receipt_lines + f\"{name}: {quantity} x {money(price)} = {money(amount)}\\n\"\n\nstudent = input().strip().lower()\nwhile student != \"yes\" and student != \"no\":\n    print(\"Student status: next input must be yes or no.\")\n    student = input().strip().lower()\ntip_percent = read_whole(\"tip percent\", 0, 100)\nif student == \"yes\":\n    discount = percent_of(subtotal, STUDENT_DISCOUNT_PERCENT)\nelse:\n    discount = 0\nnet = subtotal - discount\n# Simulation rules: tax AND tip use the discounted subtotal, not each other.\ntax = percent_of(net, TAX_PERCENT)\ntip = percent_of(net, tip_percent)\ntotal = net + tax + tip\n\nprint(\"CAMPUS CAFE | INVOICE\")\nprint(f\"Customer: {customer}\")\nprint(receipt_lines, end=\"\")\nprint(f\"Subtotal: {money(subtotal)}\")\nprint(f\"Discount: -{money(discount)}\")\nprint(f\"After discount: {money(net)}\")\nprint(f\"Tax: {money(tax)}\")\nprint(f\"Tip: {money(tip)}\")\nprint(f\"TOTAL: {money(total)}\")\n"
+    },
+    {
+      "id": "cinema",
+      "title": "Movie Ticket Kiosk",
+      "short": "Cinema",
+      "icon": "cinema",
+      "file": "movie_kiosk.py",
+      "tag": "Transfer your skills",
+      "description": "Sell adult, child, and senior tickets. Apply matinee pricing and a fee for each ticket.",
+      "focus": "A fee per ticket is different from a fee per order.",
+      "params": [
+        {
+          "key": "ADULT_PRICE",
+          "label": "Adult ticket",
+          "value": 1200,
+          "unit": "cents",
+          "min": 0,
+          "max": 100000
+        },
+        {
+          "key": "CHILD_PRICE",
+          "label": "Child ticket",
+          "value": 800,
+          "unit": "cents",
+          "min": 0,
+          "max": 100000
+        },
+        {
+          "key": "SENIOR_PRICE",
+          "label": "Senior ticket",
+          "value": 900,
+          "unit": "cents",
+          "min": 0,
+          "max": 100000
+        },
+        {
+          "key": "TAX_PERCENT",
+          "label": "Practice tax rate",
+          "value": 7,
+          "unit": "%",
+          "min": 0,
+          "max": 100
+        },
+        {
+          "key": "MATINEE_DISCOUNT_PERCENT",
+          "label": "Matinee discount",
+          "value": 20,
+          "unit": "%",
+          "min": 0,
+          "max": 100
+        },
+        {
+          "key": "BOOKING_FEE",
+          "label": "Fee per ticket",
+          "value": 150,
+          "unit": "cents",
+          "min": 0,
+          "max": 100000
+        }
+      ],
+      "fields": [
+        {
+          "label": "Customer",
+          "value": "Alex",
+          "kind": "text",
+          "max": 99
+        },
+        {
+          "label": "Adult tickets",
+          "value": "2",
+          "kind": "number",
+          "max": 99
+        },
+        {
+          "label": "Child tickets",
+          "value": "1",
+          "kind": "number",
+          "max": 99
+        },
+        {
+          "label": "Senior tickets",
+          "value": "0",
+          "kind": "number",
+          "max": 99
+        },
+        {
+          "label": "Matinee?",
+          "value": "yes",
+          "kind": "yesno",
+          "max": 99
+        }
+      ],
+      "rules": [
+        "Adult tickets cost $12.00, child tickets $8.00, and senior tickets $9.00 before discounts.",
+        "A matinee receives 20% off ticket prices; an evening order receives no discount.",
+        "The 7% practice tax applies to discounted tickets. The $1.50 booking fee applies to every ticket and is untaxed in this simulation.",
+        "Zero tickets means zero ticket charges, tax, and fees. Round percentage amounts to the nearest cent, half up."
+      ],
+      "formula": "subtotal − discount + tax + ticket count × fee",
+      "pseudocode": "READ customer\nSET subtotal and ticket count to 0\nREPEAT for each of 3 ticket categories\n    READ quantity\n    ADD line total and count tickets\nREAD matinee status\nIF matinee, calculate discount\nCALCULATE net, tax, and per-ticket fees\nPRINT the invoice",
+      "walk": [
+        {
+          "module": 1,
+          "title": "Model the transaction",
+          "explanation": "Identify two running totals: money spent and tickets sold. Both are needed because tax depends on price while the booking fee depends on quantity.",
+          "snippet": "subtotal = 0\nticket_count = 0"
+        },
+        {
+          "module": 2,
+          "title": "Use expressions precisely",
+          "explanation": "BOOKING_FEE = 150 means $1.50 per ticket. A three-ticket order needs 150 × 3 = 450 cents in fees.",
+          "snippet": "fee = line_total(BOOKING_FEE, ticket_count)"
+        },
+        {
+          "module": 3,
+          "title": "Normalize customer answers",
+          "explanation": "strip() removes accidental spaces. lower() turns YES into yes. Strings also build the itemized receipt one line at a time.",
+          "snippet": "matinee = input().strip().lower()\nreceipt_lines = receipt_lines + f\"{name}: {quantity} x {money(price)} = {money(amount)}\\n\""
+        },
+        {
+          "module": 4,
+          "title": "Select a category and price",
+          "explanation": "if / elif / else chooses adult, child, or senior pricing. A separate if decides whether the whole order gets a matinee discount.",
+          "snippet": "if category == 1:\n    name = \"Adult\"\n    price = ADULT_PRICE\nelif category == 2:\n    name = \"Child\"\n    price = CHILD_PRICE\nelse:\n    name = \"Senior\"\n    price = SENIOR_PRICE"
+        },
+        {
+          "module": 5,
+          "title": "Trace two accumulators",
+          "explanation": "On the default order, ticket_count becomes 2, then 3, then 3. subtotal becomes 2400, then 3200, then 3200 cents.",
+          "snippet": "ticket_count = ticket_count + quantity\nsubtotal = subtotal + amount"
+        },
+        {
+          "module": 6,
+          "title": "Call one function in two ways",
+          "explanation": "The same multiplication function calculates ticket lines and booking fees. Parameters describe roles; argument values can change between calls.",
+          "snippet": "line_total(1200, 2)  # 2400 cents for adult tickets\nline_total(150, 3)   # 450 cents for booking fees"
+        }
+      ],
+      "scenarios": [
+        {
+          "title": "Default matinee",
+          "values": [
+            "Alex",
+            "2",
+            "1",
+            "0",
+            "yes"
+          ],
+          "inputs": "Alex\n2\n1\n0\nyes",
+          "expected": "CAMPUS CINEMA | INVOICE\nCustomer: Alex\nAdult: 2 x $12.00 = $24.00\nChild: 1 x $8.00 = $8.00\nSenior: 0 x $9.00 = $0.00\nTickets: 3\nSubtotal: $32.00\nDiscount: -$6.40\nAfter discount: $25.60\nTax: $1.79\nBooking fee: $4.50\nTOTAL: $31.89"
+        },
+        {
+          "title": "Evening show",
+          "values": [
+            "Alex",
+            "2",
+            "1",
+            "0",
+            "no"
+          ],
+          "inputs": "Alex\n2\n1\n0\nno",
+          "expected": "CAMPUS CINEMA | INVOICE\nCustomer: Alex\nAdult: 2 x $12.00 = $24.00\nChild: 1 x $8.00 = $8.00\nSenior: 0 x $9.00 = $0.00\nTickets: 3\nSubtotal: $32.00\nDiscount: -$0.00\nAfter discount: $32.00\nTax: $2.24\nBooking fee: $4.50\nTOTAL: $38.74"
+        },
+        {
+          "title": "Senior group",
+          "values": [
+            "Alex",
+            "0",
+            "0",
+            "4",
+            "yes"
+          ],
+          "inputs": "Alex\n0\n0\n4\nyes",
+          "expected": "CAMPUS CINEMA | INVOICE\nCustomer: Alex\nAdult: 0 x $12.00 = $0.00\nChild: 0 x $8.00 = $0.00\nSenior: 4 x $9.00 = $36.00\nTickets: 4\nSubtotal: $36.00\nDiscount: -$7.20\nAfter discount: $28.80\nTax: $2.02\nBooking fee: $6.00\nTOTAL: $36.82"
+        },
+        {
+          "title": "No tickets",
+          "values": [
+            "Alex",
+            "0",
+            "0",
+            "0",
+            "no"
+          ],
+          "inputs": "Alex\n0\n0\n0\nno",
+          "expected": "CAMPUS CINEMA | INVOICE\nCustomer: Alex\nAdult: 0 x $12.00 = $0.00\nChild: 0 x $8.00 = $0.00\nSenior: 0 x $9.00 = $0.00\nTickets: 0\nSubtotal: $0.00\nDiscount: -$0.00\nAfter discount: $0.00\nTax: $0.00\nBooking fee: $0.00\nTOTAL: $0.00"
+        }
+      ],
+      "challenges": [
+        {
+          "title": "1 · Predict the matinee",
+          "task": "Calculate all amounts for 2 adults, 1 child, and no seniors at a matinee.",
+          "answer": "3 tickets; subtotal $32.00; discount $6.40; net $25.60; tax $1.79; fees $4.50; total $31.89."
+        },
+        {
+          "title": "2 · Change the show time",
+          "task": "Switch only the matinee answer to no. What stays the same?",
+          "answer": "Total $38.74. Discount $0.00, net $32.00, tax $2.24; the $4.50 fee stays the same because the ticket count does not change."
+        },
+        {
+          "title": "3 · Change a parameter",
+          "task": "Restore the default order. Set BOOKING_FEE to 200.",
+          "answer": "Fee $6.00; total $33.39. The $0.50 increase is charged three times, so total increases $1.50."
+        },
+        {
+          "title": "4 · Trace the loop",
+          "task": "Run the Senior group scenario and trace the ticket_count and subtotal after each category.",
+          "answer": "Counts: 0, 0, 4. Subtotals: $0.00, $0.00, $36.00. Discount $7.20; net $28.80; tax $2.02; fees $6.00; total $36.82."
+        },
+        {
+          "title": "5 · Debug a business rule",
+          "task": "Replace fee = line_total(BOOKING_FEE, ticket_count) with fee = BOOKING_FEE. Run the default and zero-ticket scenarios.",
+          "answer": "The default incorrectly totals $28.89; zero tickets incorrectly cost $1.50. Restore multiplication by ticket_count so fees match tickets sold."
+        },
+        {
+          "title": "6 · Refactor without changing behavior",
+          "task": "Create a booking_charge(rate, count) function that returns rate * count. Use it to calculate fee.",
+          "answer": "def booking_charge(rate, count):\n    return rate * count\n\nfee = booking_charge(BOOKING_FEE, ticket_count)\n\nDefault output must remain $31.89. Parameters are rate and count; the arguments are the current fee and ticket count."
+        }
+      ],
+      "code": "# MOVIE TICKET KIOSK | COP1000-21 | Professor Porras\n# Classroom simulation: prices are cents; rates are whole percentages.\n# Input order: customer, adult qty, child qty, senior qty, matinee yes/no.\n# Example input: Alex / 2 / 1 / 0 / yes (one value per line).\n\nADULT_PRICE = 1200\nCHILD_PRICE = 800\nSENIOR_PRICE = 900\nTAX_PERCENT = 7\nMATINEE_DISCOUNT_PERCENT = 20\nBOOKING_FEE = 150\n\ndef money(cents):\n    return f\"${cents / 100:.2f}\"\n\ndef percent_of(cents, percent):\n    # Nearest cent, with half cents rounded up for nonnegative amounts.\n    return (cents * percent + 50) // 100\n\ndef line_total(price, quantity):\n    return price * quantity\n\ndef read_whole(label, minimum, maximum):\n    while True:\n        text = input().strip()\n        if text.isascii() and text.isdigit():\n            value = int(text)\n            if minimum <= value <= maximum:\n                return value\n        print(f\"Invalid {label}. Next input must be {minimum} to {maximum}.\")\n\ncustomer = input().strip()\nif customer == \"\":\n    customer = \"Guest\"\nsubtotal = 0\nticket_count = 0\nreceipt_lines = \"\"\n\n# MODULE 5: count tickets and accumulate their prices across three categories.\nfor category in range(1, 4):\n    if category == 1:\n        name = \"Adult\"\n        price = ADULT_PRICE\n    elif category == 2:\n        name = \"Child\"\n        price = CHILD_PRICE\n    else:\n        name = \"Senior\"\n        price = SENIOR_PRICE\n    quantity = read_whole(name + \" quantity\", 0, 99)\n    amount = line_total(price, quantity)\n    ticket_count = ticket_count + quantity\n    subtotal = subtotal + amount\n    receipt_lines = receipt_lines + f\"{name}: {quantity} x {money(price)} = {money(amount)}\\n\"\n\nmatinee = input().strip().lower()\nwhile matinee != \"yes\" and matinee != \"no\":\n    print(\"Matinee status: next input must be yes or no.\")\n    matinee = input().strip().lower()\nif matinee == \"yes\":\n    discount = percent_of(subtotal, MATINEE_DISCOUNT_PERCENT)\nelse:\n    discount = 0\nnet = subtotal - discount\n# Simulation rules: tax applies to discounted tickets. Booking fees are untaxed.\ntax = percent_of(net, TAX_PERCENT)\nfee = line_total(BOOKING_FEE, ticket_count)\ntotal = net + tax + fee\n\nprint(\"CAMPUS CINEMA | INVOICE\")\nprint(f\"Customer: {customer}\")\nprint(receipt_lines, end=\"\")\nprint(f\"Tickets: {ticket_count}\")\nprint(f\"Subtotal: {money(subtotal)}\")\nprint(f\"Discount: -{money(discount)}\")\nprint(f\"After discount: {money(net)}\")\nprint(f\"Tax: {money(tax)}\")\nprint(f\"Booking fee: {money(fee)}\")\nprint(f\"TOTAL: {money(total)}\")\n"
+    },
+    {
+      "id": "bookstore",
+      "title": "Campus Bookstore Checkout",
+      "short": "Bookstore",
+      "icon": "bookstore",
+      "file": "bookstore_checkout.py",
+      "tag": "Challenge yourself",
+      "description": "Combine membership discounts, purchase thresholds, pickup, and shipping rules.",
+      "focus": "Test just below, exactly at, and above a threshold.",
+      "params": [
+        {
+          "key": "NOTEBOOK_PRICE",
+          "label": "Notebook price",
+          "value": 600,
+          "unit": "cents",
+          "min": 0,
+          "max": 100000
+        },
+        {
+          "key": "PEN_PRICE",
+          "label": "Pen price",
+          "value": 200,
+          "unit": "cents",
+          "min": 0,
+          "max": 100000
+        },
+        {
+          "key": "TEXTBOOK_PRICE",
+          "label": "Textbook price",
+          "value": 4000,
+          "unit": "cents",
+          "min": 0,
+          "max": 100000
+        },
+        {
+          "key": "TAX_PERCENT",
+          "label": "Practice tax rate",
+          "value": 7,
+          "unit": "%",
+          "min": 0,
+          "max": 100
+        },
+        {
+          "key": "MEMBER_DISCOUNT_PERCENT",
+          "label": "Member discount",
+          "value": 10,
+          "unit": "%",
+          "min": 0,
+          "max": 100
+        },
+        {
+          "key": "DISCOUNT_MINIMUM",
+          "label": "Discount threshold",
+          "value": 5000,
+          "unit": "cents",
+          "min": 0,
+          "max": 100000
+        },
+        {
+          "key": "SHIPPING_FEE",
+          "label": "Shipping charge",
+          "value": 500,
+          "unit": "cents",
+          "min": 0,
+          "max": 100000
+        },
+        {
+          "key": "FREE_SHIPPING_MINIMUM",
+          "label": "Free shipping threshold",
+          "value": 7500,
+          "unit": "cents",
+          "min": 0,
+          "max": 100000
+        }
+      ],
+      "fields": [
+        {
+          "label": "Customer",
+          "value": "Alex",
+          "kind": "text",
+          "max": 99
+        },
+        {
+          "label": "Notebooks",
+          "value": "2",
+          "kind": "number",
+          "max": 99
+        },
+        {
+          "label": "Pens",
+          "value": "3",
+          "kind": "number",
+          "max": 99
+        },
+        {
+          "label": "Textbooks",
+          "value": "1",
+          "kind": "number",
+          "max": 99
+        },
+        {
+          "label": "Member?",
+          "value": "yes",
+          "kind": "yesno",
+          "max": 99
+        },
+        {
+          "label": "Pickup?",
+          "value": "no",
+          "kind": "yesno",
+          "max": 99
+        }
+      ],
+      "rules": [
+        "Members receive 10% off only when the original subtotal is at least $50.00. Both conditions must be true.",
+        "The 7% practice tax applies to the discounted subtotal.",
+        "Pickup is free. Delivery is free at an after-discount subtotal of at least $75.00; otherwise shipping is $5.00. Shipping is untaxed in this simulation.",
+        "An order with zero items has no shipping charge. Round percentage amounts to the nearest cent, half up."
+      ],
+      "formula": "subtotal − discount + tax + shipping",
+      "pseudocode": "READ customer\nREPEAT for 3 products: read quantity and add line totals\nREAD membership and pickup choices\nIF member AND subtotal ≥ $50, apply discount\nCALCULATE net and tax\nIF empty order OR pickup OR net ≥ $75\n    shipping = 0\nELSE shipping = $5\nPRINT the invoice",
+      "walk": [
+        {
+          "module": 1,
+          "title": "Write the rules first",
+          "explanation": "The discount threshold uses the original subtotal; the free-shipping threshold uses the after-discount subtotal. Name those two values to avoid mixing them up.",
+          "snippet": "net = subtotal - discount"
+        },
+        {
+          "module": 2,
+          "title": "Represent thresholds as numbers",
+          "explanation": "5000 cents means $50.00. >= includes the boundary itself. Changing DISCOUNT_MINIMUM changes when membership saves money.",
+          "snippet": "DISCOUNT_MINIMUM = 5000\nFREE_SHIPPING_MINIMUM = 7500"
+        },
+        {
+          "module": 3,
+          "title": "Reuse string cleanup",
+          "explanation": "read_yes_no converts both answers to clean, lowercase text and repeats invalid values. Customer names keep their original capitalization.",
+          "snippet": "answer = input().strip().lower()\nreturn answer"
+        },
+        {
+          "module": 4,
+          "title": "Combine Boolean conditions",
+          "explanation": "and requires both membership and enough spending. or makes shipping free when any listed condition is true. Parenthesize conditions when it helps you read the rule.",
+          "snippet": "if member == \"yes\" and subtotal >= DISCOUNT_MINIMUM:\n    discount = percent_of(subtotal, MEMBER_DISCOUNT_PERCENT)\n\nif item_count == 0 or pickup == \"yes\" or net >= FREE_SHIPPING_MINIMUM:\n    shipping = 0"
+        },
+        {
+          "module": 5,
+          "title": "Repeat and count accurately",
+          "explanation": "The for loop processes each product once. item_count identifies a truly empty cart, even if an item price is changed to zero.",
+          "snippet": "item_count = item_count + quantity\nsubtotal = subtotal + amount"
+        },
+        {
+          "module": 6,
+          "title": "Separate input from calculation",
+          "explanation": "read_yes_no validates text; percent_of performs arithmetic; money formats output. Small functions have one clear job and can be reused.",
+          "snippet": "member = read_yes_no(\"Membership\")\npickup = read_yes_no(\"Pickup\")\ntax = percent_of(net, TAX_PERCENT)"
+        }
+      ],
+      "scenarios": [
+        {
+          "title": "Default delivery",
+          "values": [
+            "Alex",
+            "2",
+            "3",
+            "1",
+            "yes",
+            "no"
+          ],
+          "inputs": "Alex\n2\n3\n1\nyes\nno",
+          "expected": "CAMPUS BOOKSTORE | INVOICE\nCustomer: Alex\nNotebook: 2 x $6.00 = $12.00\nPen: 3 x $2.00 = $6.00\nTextbook: 1 x $40.00 = $40.00\nSubtotal: $58.00\nDiscount: -$5.80\nAfter discount: $52.20\nTax: $3.65\nShipping: $5.00\nTOTAL: $60.85"
+        },
+        {
+          "title": "Same order, pickup",
+          "values": [
+            "Alex",
+            "2",
+            "3",
+            "1",
+            "yes",
+            "yes"
+          ],
+          "inputs": "Alex\n2\n3\n1\nyes\nyes",
+          "expected": "CAMPUS BOOKSTORE | INVOICE\nCustomer: Alex\nNotebook: 2 x $6.00 = $12.00\nPen: 3 x $2.00 = $6.00\nTextbook: 1 x $40.00 = $40.00\nSubtotal: $58.00\nDiscount: -$5.80\nAfter discount: $52.20\nTax: $3.65\nShipping: $0.00\nTOTAL: $55.85"
+        },
+        {
+          "title": "Discount boundary",
+          "values": [
+            "Alex",
+            "1",
+            "2",
+            "1",
+            "yes",
+            "no"
+          ],
+          "inputs": "Alex\n1\n2\n1\nyes\nno",
+          "expected": "CAMPUS BOOKSTORE | INVOICE\nCustomer: Alex\nNotebook: 1 x $6.00 = $6.00\nPen: 2 x $2.00 = $4.00\nTextbook: 1 x $40.00 = $40.00\nSubtotal: $50.00\nDiscount: -$5.00\nAfter discount: $45.00\nTax: $3.15\nShipping: $5.00\nTOTAL: $53.15"
+        },
+        {
+          "title": "Free delivery",
+          "values": [
+            "Alex",
+            "0",
+            "0",
+            "2",
+            "no",
+            "no"
+          ],
+          "inputs": "Alex\n0\n0\n2\nno\nno",
+          "expected": "CAMPUS BOOKSTORE | INVOICE\nCustomer: Alex\nNotebook: 0 x $6.00 = $0.00\nPen: 0 x $2.00 = $0.00\nTextbook: 2 x $40.00 = $80.00\nSubtotal: $80.00\nDiscount: -$0.00\nAfter discount: $80.00\nTax: $5.60\nShipping: $0.00\nTOTAL: $85.60"
+        },
+        {
+          "title": "Empty cart",
+          "values": [
+            "Alex",
+            "0",
+            "0",
+            "0",
+            "yes",
+            "no"
+          ],
+          "inputs": "Alex\n0\n0\n0\nyes\nno",
+          "expected": "CAMPUS BOOKSTORE | INVOICE\nCustomer: Alex\nNotebook: 0 x $6.00 = $0.00\nPen: 0 x $2.00 = $0.00\nTextbook: 0 x $40.00 = $0.00\nSubtotal: $0.00\nDiscount: -$0.00\nAfter discount: $0.00\nTax: $0.00\nShipping: $0.00\nTOTAL: $0.00"
+        }
+      ],
+      "challenges": [
+        {
+          "title": "1 · Predict the order",
+          "task": "Find the total for the default member delivery order.",
+          "answer": "Subtotal $58.00; discount $5.80; net $52.20; tax $3.65; shipping $5.00; total $60.85."
+        },
+        {
+          "title": "2 · Change a choice",
+          "task": "Switch only pickup to yes on the default order.",
+          "answer": "Shipping becomes $0.00; total becomes $55.85. The discount, net, and tax stay unchanged."
+        },
+        {
+          "title": "3 · Test the discount boundary",
+          "task": "Use 1 notebook, 2 pens, and 1 textbook, member yes and pickup no. Then reduce pens from 2 to 1.",
+          "answer": "At $50.00: discount $5.00, net $45.00, tax $3.15, shipping $5.00, total $53.15. At $48.00: no discount, tax $3.36, shipping $5.00, total $56.36. A threshold can make the smaller basket cost more."
+        },
+        {
+          "title": "4 · Test the shipping boundary",
+          "task": "Use no notebooks or pens, 2 textbooks, member no, and pickup no. Set TEXTBOOK_PRICE first to 3750 and then to 3749.",
+          "answer": "At net $75.00: tax $5.25, shipping $0.00, total $80.25. At net $74.98: tax $5.25, shipping $5.00, total $85.23. The >= comparison includes exactly $75.00."
+        },
+        {
+          "title": "5 · Debug and versus or",
+          "task": "Change the member discount condition from and to or. Test a nonmember with the default $58.00 cart.",
+          "answer": "The incorrect or gives a nonmember a $5.80 discount. Correct and gives no discount, tax $4.06, shipping $5.00, total $67.06."
+        },
+        {
+          "title": "6 · Reuse and explain",
+          "task": "Test read_yes_no with YES and with a blank answer followed by yes. Explain parameters versus arguments in read_yes_no(\"Pickup\").",
+          "answer": "YES becomes yes. A blank answer is rejected and the next input line is read. label is the parameter; \"Pickup\" is the argument. The function returns the cleaned yes/no string."
+        }
+      ],
+      "code": "# CAMPUS BOOKSTORE CHECKOUT | COP1000-21 | Professor Porras\n# Classroom simulation: prices and thresholds are cents; rates are percentages.\n# Input order: customer, notebook qty, pen qty, textbook qty, member yes/no, pickup yes/no.\n# Example input: Alex / 2 / 3 / 1 / yes / no (one value per line).\n\nNOTEBOOK_PRICE = 600\nPEN_PRICE = 200\nTEXTBOOK_PRICE = 4000\nTAX_PERCENT = 7\nMEMBER_DISCOUNT_PERCENT = 10\nDISCOUNT_MINIMUM = 5000\nSHIPPING_FEE = 500\nFREE_SHIPPING_MINIMUM = 7500\n\ndef money(cents):\n    return f\"${cents / 100:.2f}\"\n\ndef percent_of(cents, percent):\n    # Nearest cent, with half cents rounded up for nonnegative amounts.\n    return (cents * percent + 50) // 100\n\ndef line_total(price, quantity):\n    return price * quantity\n\ndef read_whole(label, minimum, maximum):\n    while True:\n        text = input().strip()\n        if text.isascii() and text.isdigit():\n            value = int(text)\n            if minimum <= value <= maximum:\n                return value\n        print(f\"Invalid {label}. Next input must be {minimum} to {maximum}.\")\n\ndef read_yes_no(label):\n    answer = input().strip().lower()\n    while answer != \"yes\" and answer != \"no\":\n        print(f\"{label}: next input must be yes or no.\")\n        answer = input().strip().lower()\n    return answer\n\ncustomer = input().strip()\nif customer == \"\":\n    customer = \"Guest\"\nsubtotal = 0\nitem_count = 0\nreceipt_lines = \"\"\nfor item in range(1, 4):\n    if item == 1:\n        name = \"Notebook\"\n        price = NOTEBOOK_PRICE\n    elif item == 2:\n        name = \"Pen\"\n        price = PEN_PRICE\n    else:\n        name = \"Textbook\"\n        price = TEXTBOOK_PRICE\n    quantity = read_whole(name + \" quantity\", 0, 99)\n    amount = line_total(price, quantity)\n    item_count = item_count + quantity\n    subtotal = subtotal + amount\n    receipt_lines = receipt_lines + f\"{name}: {quantity} x {money(price)} = {money(amount)}\\n\"\n\nmember = read_yes_no(\"Membership\")\npickup = read_yes_no(\"Pickup\")\n# Both conditions must be true. Test exactly at DISCOUNT_MINIMUM, too.\nif member == \"yes\" and subtotal >= DISCOUNT_MINIMUM:\n    discount = percent_of(subtotal, MEMBER_DISCOUNT_PERCENT)\nelse:\n    discount = 0\nnet = subtotal - discount\ntax = percent_of(net, TAX_PERCENT)\n# Simulation rules: shipping is untaxed; empty orders have no shipping charge.\nif item_count == 0 or pickup == \"yes\" or net >= FREE_SHIPPING_MINIMUM:\n    shipping = 0\nelse:\n    shipping = SHIPPING_FEE\ntotal = net + tax + shipping\n\nprint(\"CAMPUS BOOKSTORE | INVOICE\")\nprint(f\"Customer: {customer}\")\nprint(receipt_lines, end=\"\")\nprint(f\"Subtotal: {money(subtotal)}\")\nprint(f\"Discount: -{money(discount)}\")\nprint(f\"After discount: {money(net)}\")\nprint(f\"Tax: {money(tax)}\")\nprint(f\"Shipping: {money(shipping)}\")\nprint(f\"TOTAL: {money(total)}\")\n"
+    }
+  ]
+}

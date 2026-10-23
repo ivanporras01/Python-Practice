@@ -41,3 +41,18 @@ All 114 reference solutions were run against their expected output and Python as
 ## Browser-local fallback
 
 An empty `apiBase` preserves the original GitHub Pages practice behavior: progress stays in the student's browser and can be downloaded as CSV. Shared class monitoring is enabled only after a real Cloudflare API URL is configured. Existing local practice data is preserved separately and is not silently assigned to a new classroom identity.
+
+## Capstone Projects (Modules 1–6 practice)
+
+Open **Capstone Projects** from the sidebar or the learning-path callout. Direct entry: `?view=capstones`; add `&project=cafe`, `&project=cinema`, or `&project=bookstore` to select an example.
+
+Three original examples combine computational thinking, variables/input/expressions, strings, decisions, repetition, and functions: **Campus Café Checkout**, **Movie Ticket Kiosk**, and **Campus Bookstore Checkout**. This working alignment follows the saved course outline; the source outline predates the Fall 2026 section, so section-specific Canvas titles should be confirmed separately. Collections, classes, and file handling are not prerequisites.
+
+Each example has a six-module walkthrough, pseudocode, a full editable Python program, guided constant/input controls, scenario input presets, a real Pyodide runner, Stop and timeout handling, a default-output comparison, previous-run comparison, and six challenges with explanations. All prices, rates, and business rules are explicitly classroom simulations. Programs calculate money in integer cents and round nonnegative percentage amounts half up.
+
+Capstones are optional examples, separate from the existing 114 exercise grades and shared instructor progress. Draft code, input, and notes save under a student-specific key in the same browser. Students can download their current `.py` program and a Markdown practice report with predictions, code, inputs, output, and reflection. Reports identify stale output and include its original code/input snapshot when needed. No new backend records or classroom migrations are required.
+
+- Content and reference code: `app/lib/capstones.json` and `public/capstones/*.py` (keep these in sync).
+- Interface: `app/capstones.tsx` and `app/capstones.css`.
+- Checks: `python3 scripts/test-capstones.py` covers 13 reference scenarios, independently specified invoice values, challenge variations, validation retries, zero orders, boundary conditions, and cent-rounding against Decimal.
+- Validation for the initial release: 305 checks; TypeScript and production build; browser execution of all three references; parameter edits and saved drafts; desktop/mobile layout and light/dark theme review.
