@@ -56,3 +56,9 @@ Capstones are optional examples, separate from the existing 114 exercise grades 
 - Interface: `app/capstones.tsx` and `app/capstones.css`.
 - Checks: `python3 scripts/test-capstones.py` covers 13 reference scenarios, independently specified invoice values, challenge variations, validation retries, zero orders, boundary conditions, and cent-rounding against Decimal.
 - Validation for the initial release: 305 checks; TypeScript and production build; browser execution of all three references; parameter edits and saved drafts; desktop/mobile layout and light/dark theme review.
+
+### Detailed capstone code guides
+
+Each project’s Understand & predict section includes a part-by-part money() explanation, a default invoice calculation trace, a complete original-code line table, and a tax-change prediction with a revealed answer. The guide explains parameters, arguments, return values, validation, string methods, indentation, branches, loops, accumulators, percentage rounding, and project-specific charges. It refers to reference code rather than student edits.
+
+Validation: 305 capstone checks, TypeScript, production build, and server rendering of every nonblank reference-code line across all three guides.

@@ -7,3 +7,13 @@
 /* Keep secondary actions legible in the portal's optional dark theme. */
 .capstones .button.secondary{background:var(--card);color:var(--green);border-color:var(--border)}
 .capstones .button.secondary:hover:not(:disabled){background:var(--secondary)}
+
+.cap-code-guide details { margin-top: 1rem; }
+.cap-code-guide summary { cursor: pointer; font-weight: 650; padding: .6rem 0; }
+.cap-guide-scroll { overflow-x: auto; margin: .8rem 0; }
+.cap-code-guide table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+.cap-code-guide th, .cap-code-guide td { text-align: left; vertical-align: top; padding: .85rem; border-bottom: 1px solid var(--border, #8886); }
+.cap-code-guide th { font-weight: 700; }
+.cap-code-guide td pre { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; min-width: 15rem; font-size: .82rem; }
+.cap-code-guide td:last-child { min-width: 16rem; line-height: 1.65; }
+.cap-code-guide li { margin-bottom: .7rem; line-height: 1.65; }
