@@ -1,13 +1,15 @@
 'use client';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Copy, Download, FolderOpen } from 'lucide-react';
 import { parseBackup, projects } from './lib/capstone-work';
-import { downloadText } from './lib/download';
+import DownloadLink from './download-link';
+import { projectPackage } from './lib/project-package';
 
 export default function ProjectFiles() {
   const [backup, setBackup] = useState<ReturnType<typeof parseBackup> | null>(null);
   const [busy, setBusy] = useState(false), [error, setError] = useState(''), [message, setMessage] = useState('');
   const project = projects.find(p => p.id === backup?.projectId);
+  const bundle = useMemo(() => backup ? projectPackage(backup.projectId, backup.work) : null, [backup]);
   async function openFile(file?: File) {
     if (!file) return;
     setBusy(true); setError(''); setMessage(''); setBackup(null);
@@ -18,11 +20,6 @@ export default function ProjectFiles() {
     } catch {
       setError('This file could not be opened. Choose a .json project backup downloaded from this portal, smaller than 250 KB.');
     } finally { setBusy(false); }
-  }
-  function downloadCode() {
-    if (!backup || !project) return;
-    try { downloadText(project.file, backup.work.code, 'text/x-python'); setMessage('Download requested. Check your browser’s Downloads folder for ' + project.file + '.'); }
-    catch { setError('The download could not start. Use Copy code to keep your work.'); }
   }
   async function copyCode() {
     if (!backup) return;
@@ -41,9 +38,9 @@ export default function ProjectFiles() {
       {message && <p role="status" className="cap-notice">{message}</p>}
       {backup && project && <div className="project-file-preview">
         <h2>{project.title}</h2><p><strong>{project.file}</strong> · Your saved code</p>
-        <div className="cap-actions"><button className="button" onClick={downloadCode}><Download size={16}/>Download Python (.py)</button><button className="button secondary" onClick={() => void copyCode()}><Copy size={16}/>Copy code</button></div>
+        <div className="cap-actions"><DownloadLink name={project.file} content={backup.work.code} className="button"><Download size={16}/>Download Python (.py)</DownloadLink>{bundle&&<DownloadLink name={project.id+"_project_files.zip"} content={bundle} mime="application/zip"><Download size={16}/>Download project files (.zip)</DownloadLink>}<button className="button secondary" onClick={() => void copyCode()}><Copy size={16}/>Copy code</button></div>
         <pre className="cap-snippet" aria-label="Python code from your backup"><code>{backup.work.code}</code></pre>
-        <p className="cap-small">Keep the original .json backup too: it includes your inputs, prediction, explanation, and last run. To keep practicing, sign in and choose Open project backup in Capstone Projects.</p>
+        <p className="cap-small">The ZIP includes your Python file, inputs, report, and a project backup. Extract it to a folder to keep using the files. Keep the original .json backup too: it includes your inputs, prediction, explanation, and last run. To keep practicing, sign in and choose Open project backup in Capstone Projects.</p>
       </div>}
       <a className="text-button" href="?view=capstones">Return to Capstone Projects →</a>
     </section>
