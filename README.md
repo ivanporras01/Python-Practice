@@ -72,3 +72,11 @@ Validation: 305 capstone checks, TypeScript, production build, and server render
 ### Saving and monitoring checks
 
 `node scripts/test-classroom.mjs` exercises authenticated project saves, reopening on another browser token, idempotent retries, conflict rejection, student isolation, preserved submitted snapshots, all three projects, and removal cleanup. Run against an isolated local Worker with a temporary Ed25519 test key in ignored `.dev.vars` and `.env.teacher-access`; never use the real classroom for fixtures. `pnpm dev` previews the actual classroom Worker after `pnpm build`, and accepts `--port`.
+
+## Portal usability review
+
+The sidebar no longer includes the W3Schools reference tab. Individual lesson reading links remain available in their lesson context. Exercise code and input drafts now save in this browser under the current student profile, survive page reloads, and remain separate when profiles change. A newer classroom code snapshot takes precedence over an older local draft; running an exercise continues to share attempts with the professor. Download Python code and Copy code are available in each exercise and in Capstones.
+
+Capstone monitoring includes counts for not started, in progress, submitted, and changed-after-submission work; project/status/student filters; recent-update or name sorting; and CSV export of the filtered view.
+
+Review follow-up: before using the portal for assessed or sensitive student work, replace name-only re-entry with individual student authentication or private access codes. This update preserves the existing join flow and does not change identities or access credentials.
