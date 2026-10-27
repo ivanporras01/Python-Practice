@@ -4,6 +4,14 @@ export type CapstoneRun = { id: string; output: string; error: string; code: str
 export type CapstoneWork = { code: string; inputs: string; prediction: string; reflection: string; lastRun: CapstoneRun | null; runIds: string[] };
 export type CapstoneRecord = { projectId: string; work: CapstoneWork; revision: number; updatedAt: number; runs: number; recentRunIds: string[]; recentSaveIds: string[]; submitted: { work: CapstoneWork; at: number; revision: number } | null };
 export type CapstoneSummary = { projectId: string; updatedAt: number; runs: number; milestones: number; status: string; submittedAt: number | null };
+/** Server validation may reorder object keys; only actual work changes are dirty. */
+export function sameWork(a: CapstoneWork, b: CapstoneWork): boolean {
+  const x = a.lastRun, y = b.lastRun;
+  return a.code === b.code && a.inputs === b.inputs && a.prediction === b.prediction && a.reflection === b.reflection
+    && a.runIds.length === b.runIds.length && a.runIds.every((id, index) => id === b.runIds[index])
+    && (x === y || !!x && !!y && x.id === y.id && x.at === y.at && x.baseline === y.baseline
+      && x.code === y.code && x.inputs === y.inputs && x.output === y.output && x.error === y.error);
+}
 export const projects = content.projects;
 export function freshWork(projectId: string): CapstoneWork {
   const p = projects.find(p => p.id === projectId)!;

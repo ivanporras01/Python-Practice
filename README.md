@@ -52,7 +52,7 @@ Each example has a six-module walkthrough, pseudocode, a full editable Python pr
 
 Capstone work is shared with the instructor while remaining separate from the existing 114 exercise grades. Code, inputs, prediction, explanation, and the last run save locally and sync to the existing Cloudflare classroom. Returning with the same first and last name loads saved projects across devices. Existing browser drafts are imported on first use; conflicts require the student to choose a copy, with backup downloads available before replacement.
 
-Students can download their current `.py` file, a Markdown practice report, and a `.json` project backup that can be reopened through **Open project backup**. Downloads use UTF-8 Blob files attached to the document with delayed URL cleanup. Reports label stale output and include the original code/input snapshot. Browser save failures and cloud failures are shown separately, with a **Save / Retry save** action. Offline edits stay queued in browser storage; unsynced work triggers a close-page warning.
+Students can download a ZIP containing their current `.py` file and inputs, a Markdown practice report, and a `.json` project backup that can be reopened through **Open project backup**. Downloads use UTF-8 Blob files attached to the document with delayed URL cleanup. Reports label stale output and include the original code/input snapshot. Browser save failures and cloud failures are shown separately, with a **Save / Retry save** action. Offline edits stay queued in browser storage; unsynced work triggers a close-page warning.
 
 The instructor dashboard includes a Capstone table, CSV export, run counts, four observable milestones (prediction, code changes, a successful current run, explanation), and submission status. Opening a student shows current work and the most recent submitted snapshot, with code/report downloads. Students may continue editing after submission; this does not replace the submitted snapshot until they submit again. Runs and milestones are formative self-reported practice indicators, not exam grades.
 
@@ -75,7 +75,7 @@ Validation: 305 capstone checks, TypeScript, production build, and server render
 
 ## Portal usability review
 
-The sidebar no longer includes the W3Schools reference tab. Individual lesson reading links remain available in their lesson context. Exercise code and input drafts now save in this browser under the current student profile, survive page reloads, and remain separate when profiles change. A newer classroom code snapshot takes precedence over an older local draft; running an exercise continues to share attempts with the professor. Download Python code and Copy code are available in each exercise and in Capstones.
+The sidebar no longer includes the W3Schools reference tab. Individual lesson reading links remain available in their lesson context. Exercise code and input drafts now save in this browser under the current student profile, survive page reloads, and remain separate when profiles change. A newer classroom code snapshot takes precedence over an older local draft; running an exercise continues to share attempts with the professor. Download code as a ZIP and Copy code are available in each exercise and in Capstones. Extract the ZIP to use its `.py` file in a Python editor.
 
 Capstone monitoring includes counts for not started, in progress, submitted, and changed-after-submission work; project/status/student filters; recent-update or name sorting; and CSV export of the filtered view.
 
@@ -83,6 +83,10 @@ Review follow-up: before using the portal for assessed or sensitive student work
 
 ### Recover a downloaded project without signing in
 
-Open `?view=files` (also linked from student entry and Capstone file controls), choose a portal `.json` backup, and download its original `.py` source. This view uses the same prepared download links as the exercise and Capstone editors. Backup contents are validated and read in the browser; they are not uploaded or executed, and opening a backup here never changes classroom records. Keep the JSON file to restore inputs, notes, and the last run in the Capstone editor.
+Open `?view=files` (also linked from student entry and Capstone file controls), choose a portal `.json` backup, and download a ZIP containing its original `.py` source and all project files. This view uses the same prepared download links as the exercise and Capstone editors. Backup contents are validated and read in the browser; they are not uploaded or executed, and opening a backup here never changes classroom records. Keep the JSON file to restore inputs, notes, and the last run in the Capstone editor.
 
-Python source downloads use prepared native download links. Students can also download a ZIP: Capstones include the exact `.py` source, `inputs.txt`, the Markdown report, the restorable JSON backup, and short instructions. Exercise ZIPs include the current code and inputs. Packages are built entirely in the browser; exporting them does not upload or execute the code.
+Downloads use prepared native ZIP links: Capstones include the exact `.py` source, `inputs.txt`, the Markdown report, the restorable JSON backup, and short instructions. Exercise ZIPs include the current code and inputs. Packages are built entirely in the browser; exporting them does not upload or execute the code.
+
+Compatibility: client save and run identifiers use cryptographic UUIDs with a `getRandomValues` fallback when `randomUUID` is unavailable. This keeps HTTP development previews and older browsers functional without using weak random identifiers.
+
+Save regression checks: `node scripts/test-capstone-work.mjs` verifies that server-normalized run data becomes clean after saving and that edits made during a save remain queued. Work comparisons use field values rather than JSON key order, preventing repeated saves after execution.

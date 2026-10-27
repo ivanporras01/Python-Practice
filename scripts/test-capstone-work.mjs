@@ -1,0 +1,25 @@
+// Regression: running a project must settle after the server normalizes its keys.
+import assert from 'node:assert/strict';
+import { createRequire } from 'node:module';
+import { realpathSync, mkdirSync } from 'node:fs';
+const require = createRequire(realpathSync(new URL('../node_modules/wrangler/package.json', import.meta.url)));
+mkdirSync(new URL('../.wrangler/checks', import.meta.url), { recursive: true });
+const outfile = new URL('../.wrangler/checks/capstone-work.mjs', import.meta.url).pathname;
+await require('esbuild').build({ entryPoints: [new URL('../app/lib/capstone-work.ts', import.meta.url).pathname], bundle: true, platform: 'node', format: 'esm', outfile });
+const { freshWork, sameWork, validateWork, parseBackup, backupText } = await import(outfile);
+const id = '6b523f7f-639e-4268-9bc7-64a19b3d0552';
+const work = { ...freshWork('cafe'), prediction: 'A readable invoice.', reflection: 'I tested the default order.', runIds: [id] };
+work.lastRun = { id, at: 123456789, code: work.code, inputs: work.inputs, baseline: false, output: 'Invoice ✓\n', error: '' };
+const response = validateWork(work);
+assert.notEqual(JSON.stringify(work), JSON.stringify(response), 'The fixture reproduces server key reordering');
+assert.equal(sameWork(work, response), true, 'A successful save must become clean');
+assert.equal(sameWork(work, parseBackup(backupText('cafe', work)).work), true, 'A backup round trip preserves all work');
+for (const key of ['code', 'inputs', 'prediction', 'reflection']) assert.equal(sameWork({ ...work, [key]: work[key] + '\nEdited' }, response), false, `${key} edits during saving stay dirty`);
+for (const key of ['code', 'inputs', 'output', 'error', 'id']) assert.equal(sameWork({ ...work, lastRun: { ...work.lastRun, [key]: work.lastRun[key] + 'Changed' } }, response), false, `Run ${key} changes stay dirty`);
+assert.equal(sameWork({ ...work, lastRun: { ...work.lastRun, baseline: true } }, response), false);
+assert.equal(sameWork({ ...work, lastRun: { ...work.lastRun, at: work.lastRun.at + 1 } }, response), false);
+assert.equal(sameWork({ ...work, lastRun: null }, response), false);
+assert.equal(sameWork({ ...work, runIds: [] }, response), false);
+assert.equal(sameWork({ ...work, runIds: ['other-run-12345678'] }, response), false);
+assert.equal(sameWork(freshWork('cafe'), validateWork(freshWork('cafe'))), true);
+console.log('PASS: normalized server saves settle; backup round trip; every work and run field preserves concurrent edits.');

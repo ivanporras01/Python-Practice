@@ -16,7 +16,7 @@ export default function ProjectFiles() {
     try {
       if (file.size > 250000) throw new Error('Choose a project backup smaller than 250 KB.');
       const loaded = parseBackup(await file.text());
-      setBackup(loaded); setMessage('Backup opened. Your Python file is ready to download.');
+      setBackup(loaded); setMessage('Backup opened. Your project files are ready to download.');
     } catch {
       setError('This file could not be opened. Choose a .json project backup downloaded from this portal, smaller than 250 KB.');
     } finally { setBusy(false); }
@@ -38,7 +38,7 @@ export default function ProjectFiles() {
       {message && <p role="status" className="cap-notice">{message}</p>}
       {backup && project && <div className="project-file-preview">
         <h2>{project.title}</h2><p><strong>{project.file}</strong> · Your saved code</p>
-        <div className="cap-actions"><DownloadLink name={project.file} content={backup.work.code} className="button"><Download size={16}/>Download Python (.py)</DownloadLink>{bundle&&<DownloadLink name={project.id+"_project_files.zip"} content={bundle} mime="application/zip"><Download size={16}/>Download project files (.zip)</DownloadLink>}<button className="button secondary" onClick={() => void copyCode()}><Copy size={16}/>Copy code</button></div>
+        <div className="cap-actions">{bundle&&<DownloadLink name={project.id+"_project_files.zip"} content={bundle} mime="application/zip" className="button"><Download size={16}/>Download project files (.zip)</DownloadLink>}<button className="button secondary" onClick={() => void copyCode()}><Copy size={16}/>Copy code</button></div>
         <pre className="cap-snippet" aria-label="Python code from your backup"><code>{backup.work.code}</code></pre>
         <p className="cap-small">The ZIP includes your Python file, inputs, report, and a project backup. Extract it to a folder to keep using the files. Keep the original .json backup too: it includes your inputs, prediction, explanation, and last run. To keep practicing, sign in and choose Open project backup in Capstone Projects.</p>
       </div>}

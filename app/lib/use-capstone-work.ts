@@ -1,7 +1,8 @@
 'use client';
+import { clientId } from './client-id';
 import { useEffect, useRef, useState } from 'react';
 import { currentStudentToken, studentCapstoneApi } from './public-classroom';
-import { freshWork, projects, validateWork, type CapstoneRecord, type CapstoneWork } from './capstone-work';
+import { freshWork, projects, sameWork, validateWork, type CapstoneRecord, type CapstoneWork } from './capstone-work';
 
 type Pending = { id: string; work: CapstoneWork; revision: number };
 type Entry = { work: CapstoneWork; revision: number; dirty: boolean; server?: CapstoneRecord; pending?: Pending };
@@ -34,7 +35,7 @@ export function useCapstoneWork(student: string, shared: boolean) {
       for (const record of data.records as CapstoneRecord[]) {
         if (!projects.some(p => p.id === record.projectId)) continue;
         const local = entries.current[record.projectId];
-        if (!local?.dirty || JSON.stringify(local.work) === JSON.stringify(record.work)) {
+        if (!local?.dirty || sameWork(local.work, record.work)) {
           entries.current[record.projectId] = { work: record.work, revision: record.revision, dirty: false, server: record };
         } else if (local.revision !== record.revision && !record.recentSaveIds.includes(local.pending?.id || '')) conflict(record.projectId, record);
         else local.server = record;
@@ -57,17 +58,17 @@ export function useCapstoneWork(student: string, shared: boolean) {
         if (!cloudReady.current && !await loadCloud()) return false;
         for (const project of projects) {
           let entry = entries.current[project.id];
-          while (entry?.dirty) {
+          while (entry?.dirty && alive.current) {
             if (conflictRef.current[project.id]) return false;
-            const pending = entry.pending || { id: crypto.randomUUID(), work: validateWork(entry.work), revision: entry.revision };
+            const pending = entry.pending || { id: clientId(), work: validateWork(entry.work), revision: entry.revision };
             entry.pending = pending; persist();
             if (alive.current) setMessage('Saving your project to the classroom…');
             const response = await studentCapstoneApi(token.current, { action: 'capstone-save', projectId: project.id, ...pending });
             if ('conflict' in response) { if (response.conflict) conflict(project.id, response.conflict); else throw new Error('The saved record changed. Reload before saving.'); return false; }
             const record = response.record as CapstoneRecord;
             const current = entries.current[project.id];
-            if (record.revision > pending.revision + 1 && JSON.stringify(record.work) !== JSON.stringify(pending.work)) { conflict(project.id, record); return false; }
-            entries.current[project.id] = { work: current.work, revision: record.revision, server: record, dirty: JSON.stringify(current.work) !== JSON.stringify(pending.work) };
+            if (record.revision > pending.revision + 1 && !sameWork(record.work, pending.work)) { conflict(project.id, record); return false; }
+            entries.current[project.id] = { work: current.work, revision: record.revision, server: record, dirty: !sameWork(current.work, pending.work) };
             persist(); entry = entries.current[project.id];
           }
         }
@@ -124,11 +125,11 @@ export function useCapstoneWork(student: string, shared: boolean) {
     if (!entry) return;
     setBusy(true);
     try {
-      const response = await studentCapstoneApi(token.current, { action: 'capstone-submit', projectId, revision: entry.revision, id: crypto.randomUUID() });
+      const response = await studentCapstoneApi(token.current, { action: 'capstone-submit', projectId, revision: entry.revision, id: clientId() });
       if (response.conflict) { conflict(projectId, response.conflict); return; }
       const record = response.record as CapstoneRecord;
       const current = entries.current[projectId];
-      entries.current[projectId] = { work: current.work, revision: record.revision, server: record, dirty: JSON.stringify(current.work) !== JSON.stringify(record.work) };
+      entries.current[projectId] = { work: current.work, revision: record.revision, server: record, dirty: !sameWork(current.work, record.work) };
       persist(); setMessage('Submitted to Professor Porras. You can keep experimenting and submit an updated version later.');
     } catch (error) { setMessage('Submission was not confirmed: ' + (error as Error).message + ' Retry when connected.'); }
     finally { setBusy(false); }
