@@ -1,4 +1,4 @@
-# CAMPUS BOOKSTORE CHECKOUT | COP1000-21 | Professor Porras
+# CAMPUS BOOKSTORE CHECKOUT | Introduction to Python | Professor Porras
 # Classroom simulation: prices and thresholds are cents; rates are percentages.
 # Input order: customer, notebook qty, pen qty, textbook qty, member yes/no, pickup yes/no.
 # Example input: Alex / 2 / 3 / 1 / yes / no (one value per line).

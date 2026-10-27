@@ -1,4 +1,4 @@
-# CAMPUS CAFE CHECKOUT | COP1000-21 | Professor Porras
+# CAMPUS CAFE CHECKOUT | Introduction to Python | Professor Porras
 # Classroom simulation: prices are cents; percentage rates are whole numbers.
 # Input order: customer, burger qty, drink qty, dessert qty, student yes/no, tip %.
 # Example input: Alex / 2 / 2 / 1 / yes / 15 (one value per line).

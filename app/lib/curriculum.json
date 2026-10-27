@@ -29,10 +29,10 @@
       {
         "id": "introduction-2",
         "title": "Try it yourself",
-        "prompt": "Welcome the class by printing Welcome to PBSC! on one line.",
+        "prompt": "Welcome the class by printing Welcome to Python Lab! on one line.",
         "starter": "# Write your solution here\n",
-        "solution": "print(\"Welcome to PBSC!\")",
-        "expected": "Welcome to PBSC!",
+        "solution": "print(\"Welcome to Python Lab!\")",
+        "expected": "Welcome to Python Lab!",
         "hint": "Place your message inside print(\"...\").",
         "test": "",
         "inputs": ""
@@ -170,8 +170,8 @@
       "Keep the instruction on its own line or before the comment.",
       "Run the program: only the instruction affects output."
     ],
-    "example": "# Show the course number\nprint(\"COP1000\")",
-    "output": "COP1000",
+    "example": "# Show the course name\nprint(\"Python\")",
+    "output": "Python",
     "pitfall": "A # inside a quoted string is ordinary text, not a comment.",
     "reference": "https://www.w3schools.com/python/python_comments.asp",
     "exercises": [
@@ -180,8 +180,8 @@
         "title": "Guided practice",
         "prompt": "Rebuild the worked example in your own editor. Use the lesson’s idea to produce the expected output.",
         "starter": "# Rebuild the worked example here\n",
-        "solution": "# Show the course number\nprint(\"COP1000\")",
-        "expected": "COP1000",
+        "solution": "# Show the course name\nprint(\"Python\")",
+        "expected": "Python",
         "hint": "Look at the worked example in the Learn tab. Notice the order of the statements.",
         "test": "",
         "inputs": ""
@@ -1709,10 +1709,10 @@
       {
         "id": "object-oriented-programming-2",
         "title": "Try it yourself",
-        "prompt": "Define a class named School with name = \"PBSC\". Create school = School() and print school.name.",
+        "prompt": "Define a class named School with name = \"Python Lab\". Create school = School() and print school.name.",
         "starter": "# Write your solution here\n",
-        "solution": "class School:\n    name = \"PBSC\"\n\nschool = School()\nprint(school.name)",
-        "expected": "PBSC",
+        "solution": "class School:\n    name = \"Python Lab\"\n\nschool = School()\nprint(school.name)",
+        "expected": "Python Lab",
         "hint": "Define the attribute inside the class body.",
         "test": "assert isinstance(school,School)",
         "inputs": ""
@@ -1850,8 +1850,8 @@
       "Use instance attributes for per-object data.",
       "Read both through an instance when appropriate."
     ],
-    "example": "class Student:\n    college = \"PBSC\"\n    def __init__(self, name):\n        self.name = name\n\na = Student(\"Maya\")\nprint(a.name, a.college)",
-    "output": "Maya PBSC",
+    "example": "class Student:\n    college = \"Python Lab\"\n    def __init__(self, name):\n        self.name = name\n\na = Student(\"Maya\")\nprint(a.name, a.college)",
+    "output": "Maya Python Lab",
     "pitfall": "A mutable class attribute, such as a list, can be shared unexpectedly between instances.",
     "reference": "https://www.w3schools.com/python/python_class_properties.asp",
     "exercises": [
@@ -1860,8 +1860,8 @@
         "title": "Guided practice",
         "prompt": "Rebuild the worked example in your own editor. Use the lesson’s idea to produce the expected output.",
         "starter": "# Rebuild the worked example here\n",
-        "solution": "class Student:\n    college = \"PBSC\"\n    def __init__(self, name):\n        self.name = name\n\na = Student(\"Maya\")\nprint(a.name, a.college)",
-        "expected": "Maya PBSC",
+        "solution": "class Student:\n    college = \"Python Lab\"\n    def __init__(self, name):\n        self.name = name\n\na = Student(\"Maya\")\nprint(a.name, a.college)",
+        "expected": "Maya Python Lab",
         "hint": "Look at the worked example in the Learn tab. Notice the order of the statements.",
         "test": "",
         "inputs": ""
@@ -1930,8 +1930,8 @@
       "Define its special method in the class.",
       "Use the normal Python operation on an instance."
     ],
-    "example": "class Course:\n    def __str__(self):\n        return \"Python at PBSC\"\n\nprint(Course())",
-    "output": "Python at PBSC",
+    "example": "class Course:\n    def __str__(self):\n        return \"Python at Python Lab\"\n\nprint(Course())",
+    "output": "Python at Python Lab",
     "pitfall": "__str__ must return a string; it should not only print one.",
     "reference": "https://www.w3schools.com/python/python_magic_methods.asp",
     "exercises": [
@@ -1940,8 +1940,8 @@
         "title": "Guided practice",
         "prompt": "Rebuild the worked example in your own editor. Use the lesson’s idea to produce the expected output.",
         "starter": "# Rebuild the worked example here\n",
-        "solution": "class Course:\n    def __str__(self):\n        return \"Python at PBSC\"\n\nprint(Course())",
-        "expected": "Python at PBSC",
+        "solution": "class Course:\n    def __str__(self):\n        return \"Python at Python Lab\"\n\nprint(Course())",
+        "expected": "Python at Python Lab",
         "hint": "Look at the worked example in the Learn tab. Notice the order of the statements.",
         "test": "",
         "inputs": ""
@@ -2229,10 +2229,10 @@
       {
         "id": "write-and-create-files-2",
         "title": "Try it yourself",
-        "prompt": "Write \"Hello\" to greeting.txt, then append \" PBSC\". Read and print the complete file.",
+        "prompt": "Write \"Hello\" to greeting.txt, then append \" Python Lab\". Read and print the complete file.",
         "starter": "# Write your solution here\n",
-        "solution": "with open(\"greeting.txt\", \"w\") as file:\n    file.write(\"Hello\")\nwith open(\"greeting.txt\", \"a\") as file:\n    file.write(\" PBSC\")\nwith open(\"greeting.txt\") as file:\n    print(file.read())",
-        "expected": "Hello PBSC",
+        "solution": "with open(\"greeting.txt\", \"w\") as file:\n    file.write(\"Hello\")\nwith open(\"greeting.txt\", \"a\") as file:\n    file.write(\" Python Lab\")\nwith open(\"greeting.txt\") as file:\n    print(file.read())",
+        "expected": "Hello Python Lab",
         "hint": "Open the file a second time with mode \"a\".",
         "test": "",
         "inputs": ""

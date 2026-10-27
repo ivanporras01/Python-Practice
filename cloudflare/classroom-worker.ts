@@ -1,5 +1,6 @@
 import { DurableObject } from 'cloudflare:workers';
 import { topics } from '../app/lib/curriculum';
+import { projects, validateWork, summarizeCapstone, milestones, type CapstoneRecord, type CapstoneSummary } from '../app/lib/capstone-work';
 
 type Env = {
   ASSETS: Fetcher;
@@ -12,6 +13,7 @@ type Student = {
   joined_at: number; last_seen: number; current_topic: string;
   completed: number; started: number; attempts: number; needs_help: number;
   topicStats: Record<string, { started: number; completed: number }>;
+  capstones?: Record<string, CapstoneSummary>;
 };
 type Progress = {
   exercise_id: string; topic_id: string; passed: number; attempts: number;
@@ -38,7 +40,7 @@ function namePart(value: unknown, label: string) {
 }
 
 async function readBody(request: Request) {
-  if (Number(request.headers.get('Content-Length') || 0) > 70000) throw new ApiError('This submission is too large.', 413);
+  if (Number(request.headers.get('Content-Length') || 0) > 250000) throw new ApiError('This submission is too large.', 413);
   if (!request.headers.get('Content-Type')?.startsWith('application/json')) throw new ApiError('Send a JSON request.', 415);
   const reader = request.body?.getReader();
   if (!reader) throw new ApiError('The request is empty.');
@@ -48,7 +50,7 @@ async function readBody(request: Request) {
     const { value, done } = await reader.read();
     if (done) break;
     bytes += value.length;
-    if (bytes > 70000) { await reader.cancel(); throw new ApiError('This submission is too large.', 413); }
+    if (bytes > 250000) { await reader.cancel(); throw new ApiError('This submission is too large.', 413); }
     text += decoder.decode(value, { stream: true });
   }
   text += decoder.decode();
@@ -144,6 +146,16 @@ export class Classroom extends DurableObject<Env> {
                     }
                   }
                 }
+                const capstones = new Map<string, CapstoneRecord>();
+                for (const profile of matching) for (const record of (await store.list<CapstoneRecord>({ prefix: `capstone:${profile.id}:` })).values()) {
+                  const prior = capstones.get(record.projectId);
+                  if (!prior || record.updatedAt > prior.updatedAt) capstones.set(record.projectId, record);
+                }
+                canonical.capstones = {};
+                for (const record of capstones.values()) {
+                  await store.put(`capstone:${canonical.id}:${record.projectId}`, record);
+                  canonical.capstones[record.projectId] = summarizeCapstone(record);
+                }
                 const stats: Student['topicStats'] = {};
                 canonical.started = merged.size;
                 canonical.completed = 0;
@@ -172,6 +184,7 @@ export class Classroom extends DurableObject<Env> {
                 const obsolete: string[] = [];
                 for (const duplicate of duplicates) {
                   obsolete.push('student:' + duplicate.id);
+                  obsolete.push(...(await store.list({ prefix: `capstone:${duplicate.id}:` })).keys());
                   const oldProgress = await store.list({ prefix: 'progress:' + duplicate.id + ':' });
                   obsolete.push(...oldProgress.keys());
                   const oldAttempts = await store.list<Attempt>({ prefix: 'attempt:' + duplicate.id + ':' });
@@ -215,7 +228,7 @@ export class Classroom extends DurableObject<Env> {
           const profile = await store.get<Student>('student:' + target);
           if (!profile) throw new ApiError('Student not found.', 404);
           const keys = ['student:' + target];
-          for (const prefix of [`progress:${target}:`, `attempt:${target}:`]) keys.push(...(await store.list({ prefix })).keys());
+          for (const prefix of [`progress:${target}:`, `attempt:${target}:`, `capstone:${target}:`]) keys.push(...(await store.list({ prefix })).keys());
           for (const [key, id] of await store.list<string>({ prefix: 'token:' })) if (id === target) keys.push(key);
           const nameIndex = 'name:' + await digest(profileName(profile));
           if (await store.get<string>(nameIndex) === target) keys.push(nameIndex);
@@ -225,6 +238,33 @@ export class Classroom extends DurableObject<Env> {
           return json({ ok: true });
         }
         if (!student) throw new ApiError('Join with your first and last name before saving practice.', 401);
+        if (body.action === 'capstone-save' || body.action === 'capstone-submit') {
+          const project = projects.find(p => p.id === body.projectId);
+          if (!project || typeof body.id !== 'string' || !/^[a-zA-Z0-9-]{16,80}$/.test(body.id) || !Number.isSafeInteger(body.revision) || Number(body.revision) < 0) throw new ApiError('Choose a valid project and revision.');
+          const key = `capstone:${student.id}:${project.id}`;
+          const prior = await store.get<CapstoneRecord>(key);
+          if (prior?.recentSaveIds.includes(body.id)) return json({ ok: true, record: prior });
+          if (Number(body.revision) !== (prior?.revision || 0)) return json({ conflict: prior || null });
+          const now = Date.now();
+          let record: CapstoneRecord;
+          if (body.action === 'capstone-submit') {
+            if (!prior || milestones(project.id, prior.work).some(m => !m.done)) throw new ApiError('Complete the four project milestones before submitting.');
+            record = { ...prior, revision: prior.revision + 1, updatedAt: now, submitted: { work: prior.work, at: now, revision: prior.revision + 1 }, recentSaveIds: [...prior.recentSaveIds, body.id].slice(-64) };
+          } else {
+            let work;
+            try { work = validateWork(body.work); } catch (error) { throw new ApiError((error as Error).message); }
+            const runIds = [...new Set([...work.runIds, ...(work.lastRun ? [work.lastRun.id] : [])])];
+            record = { projectId: project.id, work, revision: (prior?.revision || 0) + 1, updatedAt: now,
+              runs: (prior?.runs || 0) + runIds.filter(id => !prior?.recentRunIds.includes(id)).length,
+              recentRunIds: [...new Set([...(prior?.recentRunIds || []), ...runIds])].slice(-64),
+              recentSaveIds: [...(prior?.recentSaveIds || []), body.id].slice(-64), submitted: prior?.submitted || null };
+          }
+          student.last_seen = now;
+          student.current_topic = 'capstone:' + project.id;
+          student.capstones = { ...student.capstones, [project.id]: summarizeCapstone(record) };
+          await store.put({ [key]: record, ['student:' + student.id]: student });
+          return json({ ok: true, record });
+        }
         const topic = topics.find(t => t.id === body.topicId);
         if (!topic) throw new ApiError('Choose a valid topic.');
         if (body.action === 'presence') {
@@ -269,14 +309,19 @@ export class Classroom extends DurableObject<Env> {
   }
 
   private async read(request: Request, store: DurableObjectTransaction, student: Student | undefined, isTeacher: boolean) {
-    const selected = new URL(request.url).searchParams.get('student');
+    const params = new URL(request.url).searchParams;
+    if (params.get('capstones') === '1') {
+      if (!student) throw new ApiError('Join with your first and last name to load saved projects.', 401);
+      return json({ records: [...(await store.list<CapstoneRecord>({ prefix: `capstone:${student.id}:` })).values()] });
+    }
+    const selected = params.get('student');
     if (selected) {
       if (!isTeacher) throw new ApiError('Only Professor Porras can view student records.', 403);
       const profile = await store.get<Student>('student:' + selected);
       if (!profile) throw new ApiError('Student not found.', 404);
       const progress = await store.list<Progress>({ prefix: `progress:${selected}:` });
       const attempts = await store.list<Attempt>({ prefix: `attempt:${selected}:`, reverse: true, limit: 30 });
-      return json({ student: { ...profile, email: '' }, progress: [...progress.values()].map(({ recentIds: _ids, ...p }) => p), attempts: [...attempts.values()] });
+      return json({ capstones: [...(await store.list<CapstoneRecord>({ prefix: `capstone:${selected}:` })).values()], student: { ...profile, email: '' }, progress: [...progress.values()].map(({ recentIds: _ids, ...p }) => p), attempts: [...attempts.values()] });
     }
     if (isTeacher) {
       const students = [...(await store.list<Student>({ prefix: 'student:' })).values()];
@@ -306,7 +351,7 @@ export default {
     headers.set('Access-Control-Allow-Headers', 'Authorization, Content-Type');
     if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers });
     if (!['GET', 'POST'].includes(request.method)) return new Response('Method not allowed', { status: 405, headers });
-    if (url.pathname === '/api/health') return new Response(JSON.stringify({ ok: true, name: 'Python Practice Classroom', teacherConfigured: !!env.TEACHER_PUBLIC_KEY }), { headers: { ...Object.fromEntries(headers), 'Content-Type': 'application/json' } });
+    if (url.pathname === '/api/health') return new Response(JSON.stringify({ ok: true, name: 'Python Practice Classroom', capstoneVersion: 1, teacherConfigured: !!env.TEACHER_PUBLIC_KEY }), { headers: { ...Object.fromEntries(headers), 'Content-Type': 'application/json' } });
     const upstream = await env.CLASSROOM.get(env.CLASSROOM.idFromName('professor-porras-cop1000')).fetch(request);
     const response = new Response(upstream.body, upstream);
     for (const [key, value] of headers) response.headers.set(key, value);

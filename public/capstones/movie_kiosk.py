@@ -1,4 +1,4 @@
-# MOVIE TICKET KIOSK | COP1000-21 | Professor Porras
+# MOVIE TICKET KIOSK | Introduction to Python | Professor Porras
 # Classroom simulation: prices are cents; rates are whole percentages.
 # Input order: customer, adult qty, child qty, senior qty, matinee yes/no.
 # Example input: Alex / 2 / 1 / 0 / yes (one value per line).

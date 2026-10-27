@@ -11,7 +11,8 @@ async function apiBase() {
     const config = await response.json() as { apiBase?: string };
     if (!config.apiBase) return '';
     const url = new URL(config.apiBase);
-    if (url.protocol !== 'https:' && url.hostname !== 'localhost' && url.hostname !== '127.0.0.1') throw new Error('The classroom connection must use HTTPS.');
+    const localPreview = url.hostname === 'terminal.local' && url.origin === location.origin;
+    if (url.protocol !== 'https:' && url.hostname !== 'localhost' && url.hostname !== '127.0.0.1' && !localPreview) throw new Error('The classroom connection must use HTTPS.');
     return url.origin;
   })().catch(error => { configuration = undefined; throw error; });
   return configuration;
@@ -40,6 +41,16 @@ export async function publicClassroomApi(body?: unknown, path = '/api/classroom'
   }
   if (typeof data.token === 'string') localStorage.setItem(STUDENT_TOKEN, data.token);
   return data;
+}
+
+// Bind a project save to the student who started it, even if another profile
+// signs in while a slow request is still completing.
+export function currentStudentToken() { return localStorage.getItem(STUDENT_TOKEN) || ''; }
+export async function studentCapstoneApi(token: string, body?: unknown, path = '/api/classroom') {
+  if (!token) throw new Error('Join with your first and last name before saving a project.');
+  const base = await apiBase();
+  if (!base) throw new Error('Shared classroom saving is not connected.');
+  return request(base, body, path, token);
 }
 
 export async function teacherLogin(value: string) {

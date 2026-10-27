@@ -1,3 +1,4 @@
+import { downloadText } from './download';
 import { topics } from './curriculum';
 
 export const LOCAL_PRACTICE = process.env.NEXT_PUBLIC_PRACTICE_MODE === 'local';
@@ -61,10 +62,5 @@ export function downloadPracticeReport() {
     if (/^[=+@\-\t\r]/.test(text)) text = "'" + text;
     return '"' + text.replaceAll('"', '""') + '"';
   }).join(',')).join('\r\n');
-  const url = URL.createObjectURL(new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' }));
-  const anchor = document.createElement('a');
-  anchor.href = url;
-  anchor.download = 'Python-Practice-Progress.csv';
-  anchor.click();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  downloadText('Python-Practice-Progress.csv', '\uFEFF' + csv, 'text/csv');
 }

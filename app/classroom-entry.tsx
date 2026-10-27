@@ -23,7 +23,7 @@ export function StudentEntry({ onJoined }: { onJoined: () => Promise<void> }) {
       {error && <p className="form-error" role="alert">{error}</p>}
       <button className="button" disabled={busy}>{busy && <Loader2 className="spin" size={17}/>}Start practicing</button>
     </form>
-    <p className="form-note">Professor Porras can see your activity, submitted code, and progress. Return using this browser to continue your saved practice.</p>
+    <p className="form-note">Professor Porras can see your activity, submitted code, and progress. Return with the same first and last name to continue your saved practice on another device.</p>
   </section>;
 }
 

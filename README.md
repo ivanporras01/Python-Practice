@@ -1,6 +1,6 @@
 # Python Practice — Professor Porras
 
-A practice portal for Professor Porras's COP1000-21 Introduction to Programming class at Palm Beach State College.
+A practice portal for Professor Porras's Introduction to Python class.
 
 - 57 topics and 114 original exercises, arranged in W3Schools' core Python, classes, and file-handling topic order.
 - Plain-language explanations, small numbered steps, worked examples, expected output, hints, and common mistakes.
@@ -50,7 +50,13 @@ Three original examples combine computational thinking, variables/input/expressi
 
 Each example has a six-module walkthrough, pseudocode, a full editable Python program, guided constant/input controls, scenario input presets, a real Pyodide runner, Stop and timeout handling, a default-output comparison, previous-run comparison, and six challenges with explanations. All prices, rates, and business rules are explicitly classroom simulations. Programs calculate money in integer cents and round nonnegative percentage amounts half up.
 
-Capstones are optional examples, separate from the existing 114 exercise grades and shared instructor progress. Draft code, input, and notes save under a student-specific key in the same browser. Students can download their current `.py` program and a Markdown practice report with predictions, code, inputs, output, and reflection. Reports identify stale output and include its original code/input snapshot when needed. No new backend records or classroom migrations are required.
+Capstone work is shared with the instructor while remaining separate from the existing 114 exercise grades. Code, inputs, prediction, explanation, and the last run save locally and sync to the existing Cloudflare classroom. Returning with the same first and last name loads saved projects across devices. Existing browser drafts are imported on first use; conflicts require the student to choose a copy, with backup downloads available before replacement.
+
+Students can download their current `.py` file, a Markdown practice report, and a `.json` project backup that can be reopened through **Open project backup**. Downloads use UTF-8 Blob files attached to the document with delayed URL cleanup. Reports label stale output and include the original code/input snapshot. Browser save failures and cloud failures are shown separately, with a **Save / Retry save** action. Offline edits stay queued in browser storage; unsynced work triggers a close-page warning.
+
+The instructor dashboard includes a Capstone table, CSV export, run counts, four observable milestones (prediction, code changes, a successful current run, explanation), and submission status. Opening a student shows current work and the most recent submitted snapshot, with code/report downloads. Students may continue editing after submission; this does not replace the submitted snapshot until they submit again. Runs and milestones are formative self-reported practice indicators, not exam grades.
+
+The Worker uses additive `capstone:<student>:<project>` storage records in the **existing** classroom Durable Object. Keep its instance name unchanged to preserve the class roster and previous progress. Student removal also removes their Capstones. Revision checks prevent silent cross-device overwrites; mutation IDs deduplicate retries. Each work snapshot is limited to 60 KB so the current draft and submitted copy fit safely in one storage record.
 
 - Content and reference code: `app/lib/capstones.json` and `public/capstones/*.py` (keep these in sync).
 - Interface: `app/capstones.tsx` and `app/capstones.css`.
@@ -62,3 +68,7 @@ Capstones are optional examples, separate from the existing 114 exercise grades 
 Each project’s Understand & predict section includes a part-by-part money() explanation, a default invoice calculation trace, a complete original-code line table, and a tax-change prediction with a revealed answer. The guide explains parameters, arguments, return values, validation, string methods, indentation, branches, loops, accumulators, percentage rounding, and project-specific charges. It refers to reference code rather than student edits.
 
 Validation: 305 capstone checks, TypeScript, production build, and server rendering of every nonblank reference-code line across all three guides.
+
+### Saving and monitoring checks
+
+`node scripts/test-classroom.mjs` exercises authenticated project saves, reopening on another browser token, idempotent retries, conflict rejection, student isolation, preserved submitted snapshots, all three projects, and removal cleanup. Run against an isolated local Worker with a temporary Ed25519 test key in ignored `.dev.vars` and `.env.teacher-access`; never use the real classroom for fixtures. `pnpm dev` previews the actual classroom Worker after `pnpm build`, and accepts `--port`.
