@@ -80,3 +80,7 @@ The sidebar no longer includes the W3Schools reference tab. Individual lesson re
 Capstone monitoring includes counts for not started, in progress, submitted, and changed-after-submission work; project/status/student filters; recent-update or name sorting; and CSV export of the filtered view.
 
 Review follow-up: before using the portal for assessed or sensitive student work, replace name-only re-entry with individual student authentication or private access codes. This update preserves the existing join flow and does not change identities or access credentials.
+
+### Recover a downloaded project without signing in
+
+Open `?view=files` (also linked from student entry and Capstone file controls), choose a portal `.json` backup, and download its original `.py` source. This view uses the same download helper as the exercise and Capstone editors. Backup contents are validated and read in the browser; they are not uploaded or executed, and opening a backup here never changes classroom records. Keep the JSON file to restore inputs, notes, and the last run in the Capstone editor.

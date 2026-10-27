@@ -102,7 +102,7 @@ export default function Capstones({student,shared=false,onRunningChange}:{studen
         <button className="button secondary compact" disabled={running||saved.busy} onClick={()=>upload.current?.click()}>Open project backup</button>
         <input ref={upload} type="file" accept=".json,application/json" hidden onChange={e=>void importWork(e.target.files?.[0])}/>
       </div>
-      <p className="cap-small">The .py file runs in Python. The report is a readable record of your work. Keep the .json backup to reopen the complete project here. Downloads belong to you and stay on your computer.</p>
+      <p className="cap-small">The .py file runs in Python. The report is a readable record of your work. Keep the .json backup to reopen the complete project here. Downloads belong to you and stay on your computer.</p><a className="text-button" href="?view=files" target="_blank" rel="noreferrer">Open a backup without signing in ↗</a>
       {downloadMessage&&<p role="status" className="cap-notice">{downloadMessage}</p>}
       {saved.conflicts[project.id]&&<div className="cap-notice" role="alert"><p>A different version exists in the classroom. Download a backup above before replacing either copy.</p><div className="cap-actions"><button className="button secondary compact" onClick={()=>saved.resolve(project.id,true)}>Load classroom copy</button><button className="button secondary compact" onClick={()=>saved.resolve(project.id,false)}>Keep this browser’s copy</button></div></div>}
       <div className="cap-milestones">{checks.map(c=><span key={c.label} className={c.done?'done':''}>{c.done?'✓':'○'} {c.label}</span>)}</div>
