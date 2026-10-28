@@ -1,0 +1,35 @@
+name: Verify Python Practice Portal
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  portal:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.25.0
+          run_install: false
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Check TypeScript
+        run: pnpm exec tsc --noEmit
+      - name: Test Capstone examples
+        run: python3 scripts/test-capstones.py
+      - name: Test Capstone saving
+        run: node scripts/test-capstone-work.mjs
+      - name: Test student-facing error guidance
+        run: node --experimental-strip-types scripts/test-python-error-help.mjs
+      - name: Build Cloudflare frontend
+        run: pnpm build
