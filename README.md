@@ -73,6 +73,12 @@ Validation: 305 capstone checks, TypeScript, production build, and server render
 
 `node scripts/test-classroom.mjs` exercises authenticated project saves, reopening on another browser token, idempotent retries, conflict rejection, student isolation, preserved submitted snapshots, all three projects, and removal cleanup. Run against an isolated local Worker with a temporary Ed25519 test key in ignored `.dev.vars` and `.env.teacher-access`; never use the real classroom for fixtures. `pnpm dev` previews the actual classroom Worker after `pnpm build`, and accepts `--port`.
 
+## Guided Capstone experience and direct Python downloads
+
+The Capstone page highlights the learner's next incomplete milestone and jumps to the appropriate section. Students can keep the current Python source directly as a .py download, in addition to the complete ZIP package and restorable JSON backup. The independent project-file recovery page and instructor's Capstone review also have direct .py downloads, as do individual lesson exercises.
+
+The Python workspace and Capstone lab provide specific, plain-language troubleshooting guidance for common errors (including indentation, names, types, missing inputs, and infinite loops). These suggestions explain the first useful debugging step without revealing a solution.
+
 ## Portal usability review
 
 The sidebar no longer includes the W3Schools reference tab. Individual lesson reading links remain available in their lesson context. Exercise code and input drafts now save in this browser under the current student profile, survive page reloads, and remain separate when profiles change. A newer classroom code snapshot takes precedence over an older local draft; running an exercise continues to share attempts with the professor. Download code as a ZIP and Copy code are available in each exercise and in Capstones. Extract the ZIP to use its `.py` file in a Python editor.
