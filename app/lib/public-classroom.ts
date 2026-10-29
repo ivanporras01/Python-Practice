@@ -77,7 +77,7 @@ export async function leaveClassroom(teacher: boolean) {
 }
 
 export function studentLink() {
-  const url = new URL(location.href);
-  url.search = ''; url.hash = '';
-  return url.href;
+  // Always give students the independent, public Cloudflare address.
+  // Embedded previews and third-party hosts must not become share links.
+  return 'https://python-practice.hectorporras0916.workers.dev/';
 }
