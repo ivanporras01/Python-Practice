@@ -819,7 +819,7 @@
           "answer": "70.00."
         }
       ],
-      "code": "total = 0.0\nhighest = None\n\nfor count in range(5):\n    score = float(input())\n    total += score\n    if highest is None or score > highest:\n        highest = score\n\nprint(f\"Average: {total / 5:.2f}\")\nprint(f\"Highest: {highest:.2f}\")\n"
+      "code": "total = 0.0\n# Use None until the first score arrives so the maximum starts with actual input.\nhighest = None\n\n# Read exactly five scores. Keep a running sum so there is no need to store each score.\nfor count in range(5):\n    score = float(input())\n    total += score\n    # The first score sets the maximum. Later scores replace it only if they are larger.\n    if highest is None or score > highest:\n        highest = score\n\n# Divide the sum by five. The format :.2f displays two decimal places.\nprint(f\"Average: {total / 5:.2f}\")\nprint(f\"Highest: {highest:.2f}\")\n"
     },
     {
       "id": "seat_map",
@@ -904,7 +904,7 @@
           "answer": "Each printed line should contain only the seats in its own row."
         }
       ],
-      "code": "row_count = int(input())\nseat_count = int(input())\nrow_labels = \"ABCDEFGHIJKLMNOPQRSTUVWXYZ\"\n\nfor row in range(row_count):\n    seats = \"\"\n    for seat in range(1, seat_count + 1):\n        seats += f\" {row_labels[row]}{seat}\"\n    print(seats.strip())\n"
+      "code": "row_count = int(input())\nseat_count = int(input())\nrow_labels = \"ABCDEFGHIJKLMNOPQRSTUVWXYZ\"\n\n# The outer loop chooses the row letter. Index 0 selects A.\nfor row in range(row_count):\n    # Start a new string for each row so seats from the previous row do not repeat.\n    seats = \"\"\n    # Start numbering at 1. range excludes its stop value, so add 1 to include the last seat.\n    for seat in range(1, seat_count + 1):\n        seats += f\" {row_labels[row]}{seat}\"\n    # Print one completed row. strip() removes the leading space added by the first seat.\n    print(seats.strip())\n"
     },
     {
       "id": "sales",
@@ -1190,7 +1190,7 @@
           "answer": "Sum the four amounts in its row: $1,000.00."
         }
       ],
-      "code": "\"\"\"Classroom demo: weekly and quarterly sales using Python lists.\"\"\"\n\n\ndef weekly_sales():\n    \"\"\"Store seven daily sales amounts and display the weekly total.\"\"\"\n    days = [\"Monday\", \"Tuesday\", \"Wednesday\", \"Thursday\",\n            \"Friday\", \"Saturday\", \"Sunday\"]\n    sales = [0.0] * len(days)\n\n    print(\"Part 1: Weekly store sales\")\n    for day in range(len(days)):\n        sales[day] = float(input())\n\n    weekly_total = 0.0\n    for amount in sales:\n        weekly_total += amount\n\n    print(f\"Weekly total: ${weekly_total:,.2f}\")\n\n\ndef quarterly_sales():\n    \"\"\"Store and display four quarters of sales for each department.\"\"\"\n    departments = [\"X\", \"Y\", \"Z\"]\n    quarter_count = 4\n\n    # Each row is its own list, so updating one row leaves the others intact.\n    sales = [\n        [0.0] * quarter_count,\n        [0.0] * quarter_count,\n        [0.0] * quarter_count,\n    ]\n\n    print(\"\\nPart 2: XYZ Company quarterly sales\")\n    for row in range(len(departments)):\n        for column in range(quarter_count):\n            sales[row][column] = float(input())\n\n    print(\"\\nDepartment | Q1 | Q2 | Q3 | Q4\")\n    for row in range(len(departments)):\n        report_line = f\"Dept {departments[row]}\"\n        for column in range(quarter_count):\n            report_line += f\" | ${sales[row][column]:,.2f}\"\n        print(report_line)\n\n\nif __name__ == \"__main__\":\n    weekly_sales()\n    quarterly_sales()\n"
+      "code": "\"\"\"Classroom demo: weekly and quarterly sales using Python lists.\"\"\"\n\n\ndef weekly_sales():\n    \"\"\"Store seven daily sales amounts and display the weekly total.\"\"\"\n    days = [\"Monday\", \"Tuesday\", \"Wednesday\", \"Thursday\",\n            \"Friday\", \"Saturday\", \"Sunday\"]\n    # Make one slot per day. The loop uses the day index to fill the matching slot.\n    sales = [0.0] * len(days)\n\n    print(\"Part 1: Weekly store sales\")\n    for day in range(len(days)):\n        sales[day] = float(input())\n\n    # Start the accumulator at zero and add each stored amount once.\n    weekly_total = 0.0\n    for amount in sales:\n        weekly_total += amount\n\n    print(f\"Weekly total: ${weekly_total:,.2f}\")\n\n\ndef quarterly_sales():\n    \"\"\"Store and display four quarters of sales for each department.\"\"\"\n    departments = [\"X\", \"Y\", \"Z\"]\n    quarter_count = 4\n\n    # Each row is its own list, so updating one row leaves the others intact.\n    sales = [\n        [0.0] * quarter_count,\n        [0.0] * quarter_count,\n        [0.0] * quarter_count,\n    ]\n\n    print(\"\\nPart 2: XYZ Company quarterly sales\")\n    # The outer loop selects a department. The inner loop visits its four quarters.\n    for row in range(len(departments)):\n        for column in range(quarter_count):\n            # Indexes start at zero. For example, sales[1][2] stores Department Y, Q3.\n            sales[row][column] = float(input())\n\n    # Once all inputs are stored, read the same cells to build the report.\n    print(\"\\nDepartment | Q1 | Q2 | Q3 | Q4\")\n    for row in range(len(departments)):\n        report_line = f\"Dept {departments[row]}\"\n        for column in range(quarter_count):\n            report_line += f\" | ${sales[row][column]:,.2f}\"\n        # Print only after the inner loop has added all four quarters.\n        print(report_line)\n\n\nif __name__ == \"__main__\":\n    weekly_sales()\n    quarterly_sales()\n"
     },
     {
       "id": "supply_labels",
@@ -1294,7 +1294,7 @@
           "answer": "Use :.3f for the price."
         }
       ],
-      "code": "labels = []\nfor number in range(1, 4):\n    name = input().strip().title()\n    price = float(input())\n    labels.append(f\"{number:02d} | {name} | ${price:.2f}\")\n\nfor label in labels:\n    print(label)\n"
+      "code": "# Start with an empty list so we can store each finished label and print the batch later.\nlabels = []\n# range stops before 4, so the labels are numbered 1, 2, and 3.\nfor number in range(1, 4):\n    # strip() removes spaces at both ends. title() turns \"pencils\" into \"Pencils\".\n    name = input().strip().title()\n    # input() returns text. float() converts it to a number so we can format it as a price.\n    price = float(input())\n    # In the f-string, 02d displays 1 as 01 and .2f displays 1.5 as 1.50.\n    labels.append(f\"{number:02d} | {name} | ${price:.2f}\")\n\n# Loop through the finished labels in the order append() stored them.\nfor label in labels:\n    print(label)\n"
     },
     {
       "id": "expense_file",
@@ -1387,7 +1387,7 @@
           "answer": "Write mode replaces the previous file contents."
         }
       ],
-      "code": "with open(\"expenses.txt\", \"w\", encoding=\"utf-8\") as expense_file:\n    for entry in range(3):\n        expense = float(input())\n        expense_file.write(f\"{expense:.2f}\\n\")\n\ntotal = 0.0\nwith open(\"expenses.txt\", encoding=\"utf-8\") as expense_file:\n    for line in expense_file:\n        total += float(line)\n\nprint(f\"Total expenses: ${total:.2f}\")\n"
+      "code": "# Write mode starts a fresh file. The with block closes it after the last write.\nwith open(\"expenses.txt\", \"w\", encoding=\"utf-8\") as expense_file:\n    for entry in range(3):\n        expense = float(input())\n        # Put one amount on each line so the next loop can read the values separately.\n        expense_file.write(f\"{expense:.2f}\\n\")\n\ntotal = 0.0\n# Reopen in read mode after the first block has saved the file.\nwith open(\"expenses.txt\", encoding=\"utf-8\") as expense_file:\n    for line in expense_file:\n        # Each file line is text. Convert it back to a number before adding it.\n        total += float(line)\n\nprint(f\"Total expenses: ${total:.2f}\")\n"
     },
     {
       "id": "delivery_estimate",
@@ -1480,7 +1480,7 @@
           "answer": "The program reports zero loads and zero minutes."
         }
       ],
-      "code": "import math\n\nboxes = int(input())\ncapacity = int(input())\nminutes_per_load = int(input())\n\nloads = math.ceil(boxes / capacity)\nprint(f\"Loads: {loads}\")\nprint(f\"Estimated minutes: {loads * minutes_per_load}\")\n"
+      "code": "# Import the standard-library module that provides the round-up operation.\nimport math\n\nboxes = int(input())\ncapacity = int(input())\nminutes_per_load = int(input())\n\n# Even a partly filled load takes a trip. ceil() turns 2.5 loads into 3.\nloads = math.ceil(boxes / capacity)\nprint(f\"Loads: {loads}\")\n# Each load takes the same amount of time, so multiply by minutes per load.\nprint(f\"Estimated minutes: {loads * minutes_per_load}\")\n"
     },
     {
       "id": "inventory_report",
@@ -1581,7 +1581,7 @@
           "answer": "Use <= in the comparison."
         }
       ],
-      "code": "def reorder_items(inventory, threshold):\n    low_stock = []\n    for name, quantity in inventory:\n        if quantity < threshold:\n            low_stock.append(name)\n    return low_stock\n\n\nthreshold = int(input())\ninventory = []\nfor name in [\"Pencils\", \"Notebooks\", \"Folders\"]:\n    inventory.append((name, int(input())))\n\nlow_stock = reorder_items(inventory, threshold)\nprint(f\"Items to reorder: {len(low_stock)}\")\nfor name in low_stock:\n    print(name)\n"
+      "code": "def reorder_items(inventory, threshold):\n    low_stock = []\n    # Unpack each (name, quantity) pair so the comparison uses the stock count.\n    for name, quantity in inventory:\n        # Only quantities below the threshold qualify. An equal quantity stays off the list.\n        if quantity < threshold:\n            low_stock.append(name)\n    # Return the names so the caller can count and display them.\n    return low_stock\n\n\nthreshold = int(input())\ninventory = []\n# Read one quantity per item and keep each name with its matching count.\nfor name in [\"Pencils\", \"Notebooks\", \"Folders\"]:\n    inventory.append((name, int(input())))\n\nlow_stock = reorder_items(inventory, threshold)\n# Use the length of the filtered list as the count, then display its names.\nprint(f\"Items to reorder: {len(low_stock)}\")\nfor name in low_stock:\n    print(name)\n"
     }
   ]
 }

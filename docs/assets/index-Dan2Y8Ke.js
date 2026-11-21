@@ -569,14 +569,18 @@ Highest: 100.00`},{title:`Equal scores`,values:[`75`,`75`,`75`,`75`,`75`],inputs
 75
 75`,expected:`Average: 75.00
 Highest: 75.00`}],challenges:[{title:`Trace the maximum`,task:`When does highest change in the default scenario?`,answer:`At the first, second, and third scores.`},{title:`Extend the report`,task:`What is the default minimum if you track the lowest score too?`,answer:`70.00.`}],code:`total = 0.0
+# Use None until the first score arrives so the maximum starts with actual input.
 highest = None
 
+# Read exactly five scores. Keep a running sum so there is no need to store each score.
 for count in range(5):
     score = float(input())
     total += score
+    # The first score sets the maximum. Later scores replace it only if they are larger.
     if highest is None or score > highest:
         highest = score
 
+# Divide the sum by five. The format :.2f displays two decimal places.
 print(f"Average: {total / 5:.2f}")
 print(f"Highest: {highest:.2f}")
 `},{id:`seat_map`,title:`Theater Seat Map`,short:`Theater Seat Map`,icon:`practice`,file:`seat_map.py`,tag:`Module 08 · Nested loop practice`,description:`Display a seat chart with letters for rows and numbers for seats.`,focus:`Module 08 · Nested loop practice`,params:[],fields:[{label:`Number of rows (1–26)`,value:`2`,kind:`text`,max:1e4},{label:`Seats per row`,value:`3`,kind:`text`,max:1e4}],rules:[`Use 1–26 rows and a positive number of seats per row.`,`Use the outer loop for rows and the inner loop for seats.`,`Combine a row letter and a seat number.`],formula:`Build the seat label`,pseudocode:`Read the dimensions
@@ -591,10 +595,14 @@ B1 B2 B3`},{title:`One seat`,values:[`1`,`1`],inputs:`1
 seat_count = int(input())
 row_labels = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
+# The outer loop chooses the row letter. Index 0 selects A.
 for row in range(row_count):
+    # Start a new string for each row so seats from the previous row do not repeat.
     seats = ""
+    # Start numbering at 1. range excludes its stop value, so add 1 to include the last seat.
     for seat in range(1, seat_count + 1):
         seats += f" {row_labels[row]}{seat}"
+    # Print one completed row. strip() removes the leading space added by the first seat.
     print(seats.strip())
 `},{id:`sales`,title:`Weekly & Quarterly Sales`,short:`Sales`,icon:`sales`,file:`sales_report.py`,tag:`Lists & nested loops`,description:`Calculate a store’s weekly total and build a quarterly report for three departments.`,focus:`One-dimensional lists, two-dimensional lists, and nested loops`,params:[],fields:[{label:`Monday`,value:`10`,kind:`text`,max:1e5},{label:`Tuesday`,value:`20`,kind:`text`,max:1e5},{label:`Wednesday`,value:`30`,kind:`text`,max:1e5},{label:`Thursday`,value:`40`,kind:`text`,max:1e5},{label:`Friday`,value:`50`,kind:`text`,max:1e5},{label:`Saturday`,value:`60`,kind:`text`,max:1e5},{label:`Sunday`,value:`70`,kind:`text`,max:1e5},{label:`Dept X, Q1`,value:`100`,kind:`text`,max:1e5},{label:`Dept X, Q2`,value:`200`,kind:`text`,max:1e5},{label:`Dept X, Q3`,value:`300`,kind:`text`,max:1e5},{label:`Dept X, Q4`,value:`400`,kind:`text`,max:1e5},{label:`Dept Y, Q1`,value:`500`,kind:`text`,max:1e5},{label:`Dept Y, Q2`,value:`600`,kind:`text`,max:1e5},{label:`Dept Y, Q3`,value:`700`,kind:`text`,max:1e5},{label:`Dept Y, Q4`,value:`800`,kind:`text`,max:1e5},{label:`Dept Z, Q1`,value:`900`,kind:`text`,max:1e5},{label:`Dept Z, Q2`,value:`1000`,kind:`text`,max:1e5},{label:`Dept Z, Q3`,value:`1100`,kind:`text`,max:1e5},{label:`Dept Z, Q4`,value:`1200`,kind:`text`,max:1e5}],rules:[`Enter seven daily dollar amounts, Monday through Sunday.`,`Add each amount to calculate the weekly total.`,`Enter four quarterly amounts for each department: X, Y, then Z.`,`Store each quarterly amount in its own cell and display all three rows.`],formula:`sales[row][column] → department and quarter`,pseudocode:`READ seven daily sales into a list
 ADD daily sales and DISPLAY weekly total
@@ -691,12 +699,14 @@ def weekly_sales():
     """Store seven daily sales amounts and display the weekly total."""
     days = ["Monday", "Tuesday", "Wednesday", "Thursday",
             "Friday", "Saturday", "Sunday"]
+    # Make one slot per day. The loop uses the day index to fill the matching slot.
     sales = [0.0] * len(days)
 
     print("Part 1: Weekly store sales")
     for day in range(len(days)):
         sales[day] = float(input())
 
+    # Start the accumulator at zero and add each stored amount once.
     weekly_total = 0.0
     for amount in sales:
         weekly_total += amount
@@ -717,15 +727,19 @@ def quarterly_sales():
     ]
 
     print("\\nPart 2: XYZ Company quarterly sales")
+    # The outer loop selects a department. The inner loop visits its four quarters.
     for row in range(len(departments)):
         for column in range(quarter_count):
+            # Indexes start at zero. For example, sales[1][2] stores Department Y, Q3.
             sales[row][column] = float(input())
 
+    # Once all inputs are stored, read the same cells to build the report.
     print("\\nDepartment | Q1 | Q2 | Q3 | Q4")
     for row in range(len(departments)):
         report_line = f"Dept {departments[row]}"
         for column in range(quarter_count):
             report_line += f" | \${sales[row][column]:,.2f}"
+        # Print only after the inner loop has added all four quarters.
         print(report_line)
 
 
@@ -742,12 +756,18 @@ notebook
  ruler 
 2.25`,expected:`01 | Pencils | $1.50
 02 | Notebook | $3.00
-03 | Ruler | $2.25`}],challenges:[{title:`Predict the string`,task:`What does the first label look like for tape at 2.5?`,answer:`01 | Tape | $2.50.`},{title:`Extend the label`,task:`How would you show three decimal places?`,answer:`Use :.3f for the price.`}],code:`labels = []
+03 | Ruler | $2.25`}],challenges:[{title:`Predict the string`,task:`What does the first label look like for tape at 2.5?`,answer:`01 | Tape | $2.50.`},{title:`Extend the label`,task:`How would you show three decimal places?`,answer:`Use :.3f for the price.`}],code:`# Start with an empty list so we can store each finished label and print the batch later.
+labels = []
+# range stops before 4, so the labels are numbered 1, 2, and 3.
 for number in range(1, 4):
+    # strip() removes spaces at both ends. title() turns "pencils" into "Pencils".
     name = input().strip().title()
+    # input() returns text. float() converts it to a number so we can format it as a price.
     price = float(input())
+    # In the f-string, 02d displays 1 as 01 and .2f displays 1.5 as 1.50.
     labels.append(f"{number:02d} | {name} | \${price:.2f}")
 
+# Loop through the finished labels in the order append() stored them.
 for label in labels:
     print(label)
 `},{id:`expense_file`,title:`Daily Expense File`,short:`Daily Expense File`,icon:`practice`,file:`expense_file.py`,tag:`Module 11 · File practice`,description:`Save three expenses to a text file, then read them back and calculate the total.`,focus:`Module 11 · File practice`,params:[],fields:[{label:`Expense 1`,value:`5.25`,kind:`text`,max:1e4},{label:`Expense 2`,value:`10`,kind:`text`,max:1e4},{label:`Expense 3`,value:`4.75`,kind:`text`,max:1e4}],rules:[`Write one amount per line in the current working directory.`,`Reopen it and convert each text line to a number.`,`Format the result to two decimal places.`],formula:`Display the total`,pseudocode:`Write the file
@@ -757,14 +777,18 @@ Display the total`,walk:[{module:1,title:`Write the file`,explanation:`Write one
 10
 4.75`,expected:`Total expenses: $20.00`},{title:`Zero expenses`,values:[`0`,`0`,`0`],inputs:`0
 0
-0`,expected:`Total expenses: $0.00`}],challenges:[{title:`Predict the file`,task:`How many lines does the default run write?`,answer:`Three.`},{title:`Predict repeat behavior`,task:`What happens if the program runs again in the same directory?`,answer:`Write mode replaces the previous file contents.`}],code:`with open("expenses.txt", "w", encoding="utf-8") as expense_file:
+0`,expected:`Total expenses: $0.00`}],challenges:[{title:`Predict the file`,task:`How many lines does the default run write?`,answer:`Three.`},{title:`Predict repeat behavior`,task:`What happens if the program runs again in the same directory?`,answer:`Write mode replaces the previous file contents.`}],code:`# Write mode starts a fresh file. The with block closes it after the last write.
+with open("expenses.txt", "w", encoding="utf-8") as expense_file:
     for entry in range(3):
         expense = float(input())
+        # Put one amount on each line so the next loop can read the values separately.
         expense_file.write(f"{expense:.2f}\\n")
 
 total = 0.0
+# Reopen in read mode after the first block has saved the file.
 with open("expenses.txt", encoding="utf-8") as expense_file:
     for line in expense_file:
+        # Each file line is text. Convert it back to a number before adding it.
         total += float(line)
 
 print(f"Total expenses: \${total:.2f}")
@@ -776,14 +800,17 @@ Calculate delivery time`,walk:[{module:1,title:`Import the helper`,explanation:`
 Estimated minutes: 36`},{title:`Exact capacity`,values:[`20`,`10`,`12`],inputs:`20
 10
 12`,expected:`Loads: 2
-Estimated minutes: 24`}],challenges:[{title:`Predict the trips`,task:`How many loads do 21 boxes need at 10 boxes per load?`,answer:`Three.`},{title:`Try the boundary`,task:`What happens with zero boxes and a positive capacity?`,answer:`The program reports zero loads and zero minutes.`}],code:`import math
+Estimated minutes: 24`}],challenges:[{title:`Predict the trips`,task:`How many loads do 21 boxes need at 10 boxes per load?`,answer:`Three.`},{title:`Try the boundary`,task:`What happens with zero boxes and a positive capacity?`,answer:`The program reports zero loads and zero minutes.`}],code:`# Import the standard-library module that provides the round-up operation.
+import math
 
 boxes = int(input())
 capacity = int(input())
 minutes_per_load = int(input())
 
+# Even a partly filled load takes a trip. ceil() turns 2.5 loads into 3.
 loads = math.ceil(boxes / capacity)
 print(f"Loads: {loads}")
+# Each load takes the same amount of time, so multiply by minutes per load.
 print(f"Estimated minutes: {loads * minutes_per_load}")
 `},{id:`inventory_report`,title:`Inventory Reorder Report`,short:`Inventory Reorder Report`,icon:`practice`,file:`inventory_report.py`,tag:`Module 13 · Cumulative practice`,description:`Count items below a reorder threshold and print a report using a function, list, loop, and condition.`,focus:`Module 13 · Cumulative practice`,params:[],fields:[{label:`Reorder threshold`,value:`10`,kind:`text`,max:1e4},{label:`Pencil stock`,value:`4`,kind:`text`,max:1e4},{label:`Notebook stock`,value:`18`,kind:`text`,max:1e4},{label:`Folder stock`,value:`7`,kind:`text`,max:1e4}],rules:[`Pair each item name with its quantity.`,`A function returns the names whose quantities are below the threshold.`,`Count and print the selected items.`],formula:`Display the result`,pseudocode:`Store related data
 Select the items
@@ -799,18 +826,23 @@ Folders`},{title:`At or above threshold`,values:[`10`,`10`,`11`,`12`],inputs:`10
 11
 12`,expected:`Items to reorder: 0`}],challenges:[{title:`Test the boundary`,task:`Should an item with exactly 10 units appear when the threshold is 10?`,answer:`No. The condition is strictly less than 10.`},{title:`Change the rule`,task:`How could you include items exactly at the threshold?`,answer:`Use <= in the comparison.`}],code:`def reorder_items(inventory, threshold):
     low_stock = []
+    # Unpack each (name, quantity) pair so the comparison uses the stock count.
     for name, quantity in inventory:
+        # Only quantities below the threshold qualify. An equal quantity stays off the list.
         if quantity < threshold:
             low_stock.append(name)
+    # Return the names so the caller can count and display them.
     return low_stock
 
 
 threshold = int(input())
 inventory = []
+# Read one quantity per item and keep each name with its matching count.
 for name in ["Pencils", "Notebooks", "Folders"]:
     inventory.append((name, int(input())))
 
 low_stock = reorder_items(inventory, threshold)
+# Use the length of the filtered list as the count, then display its names.
 print(f"Items to reorder: {len(low_stock)}")
 for name in low_stock:
     print(name)
