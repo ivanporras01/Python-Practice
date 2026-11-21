@@ -22,7 +22,7 @@ export function CapstoneDashboard({ roster, openStudent }: { roster: Learner[]; 
     <div className="cap-monitor-summary" aria-label="Project totals for the selected project">{statuses.map(label=><button key={label} className={status===label?'selected':''} aria-pressed={status===label} onClick={()=>setStatus(status===label?'all':label)}><strong>{projectRows.filter(r=>(r.summary?.status||'Not started')===label).length}</strong><span>{label}</span></button>)}</div>
     <div className="cap-monitor-filters">
       <label>Find a student<input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Student name"/></label>
-      <label>Project<select value={project} onChange={e=>setProject(e.target.value)}><option value="all">All three projects</option>{projects.map(p=><option key={p.id} value={p.id}>{p.title}</option>)}</select></label>
+      <label>Project<select value={project} onChange={e=>setProject(e.target.value)}><option value="all">All projects</option>{projects.map(p=><option key={p.id} value={p.id}>{p.title}</option>)}</select></label>
       <label>Project status<select value={status} onChange={e=>setStatus(e.target.value)}><option value="all">All statuses</option>{statuses.map(label=><option key={label}>{label}</option>)}</select></label>
       <label>Sort projects<select value={sort} onChange={e=>setSort(e.target.value)}><option value="recent">Recently updated first</option><option value="name">Student name</option></select></label>
     </div>

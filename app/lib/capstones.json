@@ -711,6 +711,877 @@
         }
       ],
       "code": "# CAMPUS BOOKSTORE CHECKOUT | Introduction to Python | Professor Porras\n# Classroom simulation: prices and thresholds are cents; rates are percentages.\n# Input order: customer, notebook qty, pen qty, textbook qty, member yes/no, pickup yes/no.\n# Example input: Alex / 2 / 3 / 1 / yes / no (one value per line).\n\nNOTEBOOK_PRICE = 600\nPEN_PRICE = 200\nTEXTBOOK_PRICE = 4000\nTAX_PERCENT = 7\nMEMBER_DISCOUNT_PERCENT = 10\nDISCOUNT_MINIMUM = 5000\nSHIPPING_FEE = 500\nFREE_SHIPPING_MINIMUM = 7500\n\ndef money(cents):\n    return f\"${cents / 100:.2f}\"\n\ndef percent_of(cents, percent):\n    # Nearest cent, with half cents rounded up for nonnegative amounts.\n    return (cents * percent + 50) // 100\n\ndef line_total(price, quantity):\n    return price * quantity\n\ndef read_whole(label, minimum, maximum):\n    while True:\n        text = input().strip()\n        if text.isascii() and text.isdigit():\n            value = int(text)\n            if minimum <= value <= maximum:\n                return value\n        print(f\"Invalid {label}. Next input must be {minimum} to {maximum}.\")\n\ndef read_yes_no(label):\n    answer = input().strip().lower()\n    while answer != \"yes\" and answer != \"no\":\n        print(f\"{label}: next input must be yes or no.\")\n        answer = input().strip().lower()\n    return answer\n\ncustomer = input().strip()\nif customer == \"\":\n    customer = \"Guest\"\nsubtotal = 0\nitem_count = 0\nreceipt_lines = \"\"\nfor item in range(1, 4):\n    if item == 1:\n        name = \"Notebook\"\n        price = NOTEBOOK_PRICE\n    elif item == 2:\n        name = \"Pen\"\n        price = PEN_PRICE\n    else:\n        name = \"Textbook\"\n        price = TEXTBOOK_PRICE\n    quantity = read_whole(name + \" quantity\", 0, 99)\n    amount = line_total(price, quantity)\n    item_count = item_count + quantity\n    subtotal = subtotal + amount\n    receipt_lines = receipt_lines + f\"{name}: {quantity} x {money(price)} = {money(amount)}\\n\"\n\nmember = read_yes_no(\"Membership\")\npickup = read_yes_no(\"Pickup\")\n# Both conditions must be true. Test exactly at DISCOUNT_MINIMUM, too.\nif member == \"yes\" and subtotal >= DISCOUNT_MINIMUM:\n    discount = percent_of(subtotal, MEMBER_DISCOUNT_PERCENT)\nelse:\n    discount = 0\nnet = subtotal - discount\ntax = percent_of(net, TAX_PERCENT)\n# Simulation rules: shipping is untaxed; empty orders have no shipping charge.\nif item_count == 0 or pickup == \"yes\" or net >= FREE_SHIPPING_MINIMUM:\n    shipping = 0\nelse:\n    shipping = SHIPPING_FEE\ntotal = net + tax + shipping\n\nprint(\"CAMPUS BOOKSTORE | INVOICE\")\nprint(f\"Customer: {customer}\")\nprint(receipt_lines, end=\"\")\nprint(f\"Subtotal: {money(subtotal)}\")\nprint(f\"Discount: -{money(discount)}\")\nprint(f\"After discount: {money(net)}\")\nprint(f\"Tax: {money(tax)}\")\nprint(f\"Shipping: {money(shipping)}\")\nprint(f\"TOTAL: {money(total)}\")\n"
+    },
+    {
+      "id": "score_average",
+      "title": "Quiz Score Analyzer",
+      "short": "Quiz Score Analyzer",
+      "icon": "practice",
+      "file": "score_average.py",
+      "tag": "Module 07 · Loop practice",
+      "description": "Read five scores and report their average and highest value.",
+      "focus": "Module 07 · Loop practice",
+      "params": [],
+      "fields": [
+        {
+          "label": "Score 1",
+          "value": "80",
+          "kind": "text",
+          "max": 10000
+        },
+        {
+          "label": "Score 2",
+          "value": "90",
+          "kind": "text",
+          "max": 10000
+        },
+        {
+          "label": "Score 3",
+          "value": "100",
+          "kind": "text",
+          "max": 10000
+        },
+        {
+          "label": "Score 4",
+          "value": "70",
+          "kind": "text",
+          "max": 10000
+        },
+        {
+          "label": "Score 5",
+          "value": "85",
+          "kind": "text",
+          "max": 10000
+        }
+      ],
+      "rules": [
+        "Start at zero so each score contributes once.",
+        "Use one loop to read exactly five values.",
+        "Divide the accumulated total by the number of scores."
+      ],
+      "formula": "Report the average",
+      "pseudocode": "Initialize the running total\nCollect five scores\nReport the average",
+      "walk": [
+        {
+          "module": 1,
+          "title": "Initialize the running total",
+          "explanation": "Start at zero so each score contributes once.",
+          "snippet": "total = 0.0"
+        },
+        {
+          "module": 2,
+          "title": "Collect five scores",
+          "explanation": "Use one loop to read exactly five values.",
+          "snippet": "for count in range(5):\n    score = float(input())"
+        },
+        {
+          "module": 3,
+          "title": "Report the average",
+          "explanation": "Divide the accumulated total by the number of scores.",
+          "snippet": "print(f\"Average: {total / 5:.2f}\")"
+        }
+      ],
+      "scenarios": [
+        {
+          "title": "Typical scores",
+          "values": [
+            "80",
+            "90",
+            "100",
+            "70",
+            "85"
+          ],
+          "inputs": "80\n90\n100\n70\n85",
+          "expected": "Average: 85.00\nHighest: 100.00"
+        },
+        {
+          "title": "Equal scores",
+          "values": [
+            "75",
+            "75",
+            "75",
+            "75",
+            "75"
+          ],
+          "inputs": "75\n75\n75\n75\n75",
+          "expected": "Average: 75.00\nHighest: 75.00"
+        }
+      ],
+      "challenges": [
+        {
+          "title": "Trace the maximum",
+          "task": "When does highest change in the default scenario?",
+          "answer": "At the first, second, and third scores."
+        },
+        {
+          "title": "Extend the report",
+          "task": "What is the default minimum if you track the lowest score too?",
+          "answer": "70.00."
+        }
+      ],
+      "code": "total = 0.0\nhighest = None\n\nfor count in range(5):\n    score = float(input())\n    total += score\n    if highest is None or score > highest:\n        highest = score\n\nprint(f\"Average: {total / 5:.2f}\")\nprint(f\"Highest: {highest:.2f}\")\n"
+    },
+    {
+      "id": "seat_map",
+      "title": "Theater Seat Map",
+      "short": "Theater Seat Map",
+      "icon": "practice",
+      "file": "seat_map.py",
+      "tag": "Module 08 · Nested loop practice",
+      "description": "Display a seat chart with letters for rows and numbers for seats.",
+      "focus": "Module 08 · Nested loop practice",
+      "params": [],
+      "fields": [
+        {
+          "label": "Number of rows (1–26)",
+          "value": "2",
+          "kind": "text",
+          "max": 10000
+        },
+        {
+          "label": "Seats per row",
+          "value": "3",
+          "kind": "text",
+          "max": 10000
+        }
+      ],
+      "rules": [
+        "Use 1–26 rows and a positive number of seats per row.",
+        "Use the outer loop for rows and the inner loop for seats.",
+        "Combine a row letter and a seat number."
+      ],
+      "formula": "Build the seat label",
+      "pseudocode": "Read the dimensions\nVisit every seat\nBuild the seat label",
+      "walk": [
+        {
+          "module": 1,
+          "title": "Read the dimensions",
+          "explanation": "Use 1–26 rows and a positive number of seats per row.",
+          "snippet": "row_count = int(input())\nseat_count = int(input())"
+        },
+        {
+          "module": 2,
+          "title": "Visit every seat",
+          "explanation": "Use the outer loop for rows and the inner loop for seats.",
+          "snippet": "for row in range(row_count):\n    for seat in range(1, seat_count + 1):\n        print(row, seat)"
+        },
+        {
+          "module": 3,
+          "title": "Build the seat label",
+          "explanation": "Combine a row letter and a seat number.",
+          "snippet": "label = f\"{row_labels[row]}{seat}\""
+        }
+      ],
+      "scenarios": [
+        {
+          "title": "Two rows",
+          "values": [
+            "2",
+            "3"
+          ],
+          "inputs": "2\n3",
+          "expected": "A1 A2 A3\nB1 B2 B3"
+        },
+        {
+          "title": "One seat",
+          "values": [
+            "1",
+            "1"
+          ],
+          "inputs": "1\n1",
+          "expected": "A1"
+        }
+      ],
+      "challenges": [
+        {
+          "title": "Predict the last seat",
+          "task": "What is the last label for 3 rows and 4 seats?",
+          "answer": "C4."
+        },
+        {
+          "title": "Trace the reset",
+          "task": "Why set seats to an empty string inside the outer loop?",
+          "answer": "Each printed line should contain only the seats in its own row."
+        }
+      ],
+      "code": "row_count = int(input())\nseat_count = int(input())\nrow_labels = \"ABCDEFGHIJKLMNOPQRSTUVWXYZ\"\n\nfor row in range(row_count):\n    seats = \"\"\n    for seat in range(1, seat_count + 1):\n        seats += f\" {row_labels[row]}{seat}\"\n    print(seats.strip())\n"
+    },
+    {
+      "id": "sales",
+      "title": "Weekly & Quarterly Sales",
+      "short": "Sales",
+      "icon": "sales",
+      "file": "sales_report.py",
+      "tag": "Lists & nested loops",
+      "description": "Calculate a store’s weekly total and build a quarterly report for three departments.",
+      "focus": "One-dimensional lists, two-dimensional lists, and nested loops",
+      "params": [],
+      "fields": [
+        {
+          "label": "Monday",
+          "value": "10",
+          "kind": "text",
+          "max": 100000
+        },
+        {
+          "label": "Tuesday",
+          "value": "20",
+          "kind": "text",
+          "max": 100000
+        },
+        {
+          "label": "Wednesday",
+          "value": "30",
+          "kind": "text",
+          "max": 100000
+        },
+        {
+          "label": "Thursday",
+          "value": "40",
+          "kind": "text",
+          "max": 100000
+        },
+        {
+          "label": "Friday",
+          "value": "50",
+          "kind": "text",
+          "max": 100000
+        },
+        {
+          "label": "Saturday",
+          "value": "60",
+          "kind": "text",
+          "max": 100000
+        },
+        {
+          "label": "Sunday",
+          "value": "70",
+          "kind": "text",
+          "max": 100000
+        },
+        {
+          "label": "Dept X, Q1",
+          "value": "100",
+          "kind": "text",
+          "max": 100000
+        },
+        {
+          "label": "Dept X, Q2",
+          "value": "200",
+          "kind": "text",
+          "max": 100000
+        },
+        {
+          "label": "Dept X, Q3",
+          "value": "300",
+          "kind": "text",
+          "max": 100000
+        },
+        {
+          "label": "Dept X, Q4",
+          "value": "400",
+          "kind": "text",
+          "max": 100000
+        },
+        {
+          "label": "Dept Y, Q1",
+          "value": "500",
+          "kind": "text",
+          "max": 100000
+        },
+        {
+          "label": "Dept Y, Q2",
+          "value": "600",
+          "kind": "text",
+          "max": 100000
+        },
+        {
+          "label": "Dept Y, Q3",
+          "value": "700",
+          "kind": "text",
+          "max": 100000
+        },
+        {
+          "label": "Dept Y, Q4",
+          "value": "800",
+          "kind": "text",
+          "max": 100000
+        },
+        {
+          "label": "Dept Z, Q1",
+          "value": "900",
+          "kind": "text",
+          "max": 100000
+        },
+        {
+          "label": "Dept Z, Q2",
+          "value": "1000",
+          "kind": "text",
+          "max": 100000
+        },
+        {
+          "label": "Dept Z, Q3",
+          "value": "1100",
+          "kind": "text",
+          "max": 100000
+        },
+        {
+          "label": "Dept Z, Q4",
+          "value": "1200",
+          "kind": "text",
+          "max": 100000
+        }
+      ],
+      "rules": [
+        "Enter seven daily dollar amounts, Monday through Sunday.",
+        "Add each amount to calculate the weekly total.",
+        "Enter four quarterly amounts for each department: X, Y, then Z.",
+        "Store each quarterly amount in its own cell and display all three rows."
+      ],
+      "formula": "sales[row][column] → department and quarter",
+      "pseudocode": "READ seven daily sales into a list\nADD daily sales and DISPLAY weekly total\nFOR each department\n    FOR each quarter\n        READ sales into the corresponding cell\nDISPLAY each department’s four quarterly sales",
+      "walk": [
+        {
+          "module": 1,
+          "title": "Plan the report",
+          "explanation": "Read seven daily amounts, then twelve quarterly amounts for three departments. The weekly total and quarterly table are separate outputs.",
+          "snippet": "weekly_sales()\nquarterly_sales()"
+        },
+        {
+          "module": 2,
+          "title": "Create a list",
+          "explanation": "Reserve one slot per day. Index 0 is Monday and index 6 is Sunday.",
+          "snippet": "sales = [0.0] * len(days)"
+        },
+        {
+          "module": 3,
+          "title": "Convert input",
+          "explanation": "input() returns text. Convert it to a number so the amounts can be added.",
+          "snippet": "sales[day] = float(input())"
+        },
+        {
+          "module": 4,
+          "title": "Calculate the weekly total",
+          "explanation": "Start at zero and add each daily amount once.",
+          "snippet": "weekly_total = 0.0\nfor amount in sales:\n    weekly_total += amount"
+        },
+        {
+          "module": 5,
+          "title": "Read a 3 × 4 table",
+          "explanation": "The outer loop selects the department row. The inner loop walks through that row’s four quarters.",
+          "snippet": "for row in range(len(departments)):\n    for column in range(quarter_count):\n        sales[row][column] = float(input())"
+        },
+        {
+          "module": 6,
+          "title": "Display and trace the report",
+          "explanation": "Read the same cells in the same order. Y is row 1 and Q3 is column 2.",
+          "snippet": "sales[1][2]  # Department Y, Quarter 3"
+        }
+      ],
+      "scenarios": [
+        {
+          "title": "Weekly and quarterly sales",
+          "values": [
+            "10",
+            "20",
+            "30",
+            "40",
+            "50",
+            "60",
+            "70",
+            "100",
+            "200",
+            "300",
+            "400",
+            "500",
+            "600",
+            "700",
+            "800",
+            "900",
+            "1000",
+            "1100",
+            "1200"
+          ],
+          "inputs": "10\n20\n30\n40\n50\n60\n70\n100\n200\n300\n400\n500\n600\n700\n800\n900\n1000\n1100\n1200",
+          "expected": "Part 1: Weekly store sales\nWeekly total: $280.00\n\nPart 2: XYZ Company quarterly sales\n\nDepartment | Q1 | Q2 | Q3 | Q4\nDept X | $100.00 | $200.00 | $300.00 | $400.00\nDept Y | $500.00 | $600.00 | $700.00 | $800.00\nDept Z | $900.00 | $1,000.00 | $1,100.00 | $1,200.00"
+        },
+        {
+          "title": "Zero sales",
+          "values": [
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0"
+          ],
+          "inputs": "0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0",
+          "expected": "Part 1: Weekly store sales\nWeekly total: $0.00\n\nPart 2: XYZ Company quarterly sales\n\nDepartment | Q1 | Q2 | Q3 | Q4\nDept X | $0.00 | $0.00 | $0.00 | $0.00\nDept Y | $0.00 | $0.00 | $0.00 | $0.00\nDept Z | $0.00 | $0.00 | $0.00 | $0.00"
+        },
+        {
+          "title": "Sales with cents",
+          "values": [
+            "1.25",
+            "2.25",
+            "3.25",
+            "4.25",
+            "5.25",
+            "6.25",
+            "7.25",
+            "8.25",
+            "9.25",
+            "10.25",
+            "11.25",
+            "12.25",
+            "13.25",
+            "14.25",
+            "15.25",
+            "16.25",
+            "17.25",
+            "18.25",
+            "19.25"
+          ],
+          "inputs": "1.25\n2.25\n3.25\n4.25\n5.25\n6.25\n7.25\n8.25\n9.25\n10.25\n11.25\n12.25\n13.25\n14.25\n15.25\n16.25\n17.25\n18.25\n19.25",
+          "expected": "Part 1: Weekly store sales\nWeekly total: $29.75\n\nPart 2: XYZ Company quarterly sales\n\nDepartment | Q1 | Q2 | Q3 | Q4\nDept X | $8.25 | $9.25 | $10.25 | $11.25\nDept Y | $12.25 | $13.25 | $14.25 | $15.25\nDept Z | $16.25 | $17.25 | $18.25 | $19.25"
+        }
+      ],
+      "challenges": [
+        {
+          "title": "1 · Predict the weekly total",
+          "task": "Add the seven default daily amounts before running the program.",
+          "answer": "$280.00."
+        },
+        {
+          "title": "2 · Trace a cell",
+          "task": "Which list position holds Department Y’s Q3 amount? What does it contain in the default example?",
+          "answer": "sales[1][2] holds $700.00."
+        },
+        {
+          "title": "3 · Change one daily sale",
+          "task": "Change Monday from 10 to 25. Which output changes?",
+          "answer": "The weekly total increases from $280.00 to $295.00."
+        },
+        {
+          "title": "4 · Find the final cell",
+          "task": "Which row and column hold Department Z’s Q4 sale?",
+          "answer": "Row 2, column 3."
+        },
+        {
+          "title": "5 · Test zero sales",
+          "task": "Run the zero-sales scenario. What should the report show?",
+          "answer": "The weekly total and all 12 quarterly amounts are $0.00."
+        },
+        {
+          "title": "6 · Extend the report",
+          "task": "Add a yearly total for each department. What should Department X show for the default inputs?",
+          "answer": "Sum the four amounts in its row: $1,000.00."
+        }
+      ],
+      "code": "\"\"\"Classroom demo: weekly and quarterly sales using Python lists.\"\"\"\n\n\ndef weekly_sales():\n    \"\"\"Store seven daily sales amounts and display the weekly total.\"\"\"\n    days = [\"Monday\", \"Tuesday\", \"Wednesday\", \"Thursday\",\n            \"Friday\", \"Saturday\", \"Sunday\"]\n    sales = [0.0] * len(days)\n\n    print(\"Part 1: Weekly store sales\")\n    for day in range(len(days)):\n        sales[day] = float(input())\n\n    weekly_total = 0.0\n    for amount in sales:\n        weekly_total += amount\n\n    print(f\"Weekly total: ${weekly_total:,.2f}\")\n\n\ndef quarterly_sales():\n    \"\"\"Store and display four quarters of sales for each department.\"\"\"\n    departments = [\"X\", \"Y\", \"Z\"]\n    quarter_count = 4\n\n    # Each row is its own list, so updating one row leaves the others intact.\n    sales = [\n        [0.0] * quarter_count,\n        [0.0] * quarter_count,\n        [0.0] * quarter_count,\n    ]\n\n    print(\"\\nPart 2: XYZ Company quarterly sales\")\n    for row in range(len(departments)):\n        for column in range(quarter_count):\n            sales[row][column] = float(input())\n\n    print(\"\\nDepartment | Q1 | Q2 | Q3 | Q4\")\n    for row in range(len(departments)):\n        report_line = f\"Dept {departments[row]}\"\n        for column in range(quarter_count):\n            report_line += f\" | ${sales[row][column]:,.2f}\"\n        print(report_line)\n\n\nif __name__ == \"__main__\":\n    weekly_sales()\n    quarterly_sales()\n"
+    },
+    {
+      "id": "supply_labels",
+      "title": "School Supply Labels",
+      "short": "School Supply Labels",
+      "icon": "practice",
+      "file": "supply_labels.py",
+      "tag": "Module 10 · Lists, strings & formatting",
+      "description": "Clean up item names and print numbered labels with prices.",
+      "focus": "Module 10 · Lists, strings & formatting",
+      "params": [],
+      "fields": [
+        {
+          "label": "First item",
+          "value": " pencils ",
+          "kind": "text",
+          "max": 10000
+        },
+        {
+          "label": "First price",
+          "value": "1.5",
+          "kind": "text",
+          "max": 10000
+        },
+        {
+          "label": "Second item",
+          "value": "notebook",
+          "kind": "text",
+          "max": 10000
+        },
+        {
+          "label": "Second price",
+          "value": "3",
+          "kind": "text",
+          "max": 10000
+        },
+        {
+          "label": "Third item",
+          "value": " ruler ",
+          "kind": "text",
+          "max": 10000
+        },
+        {
+          "label": "Third price",
+          "value": "2.25",
+          "kind": "text",
+          "max": 10000
+        }
+      ],
+      "rules": [
+        "Strip outer spaces and apply title case.",
+        "Show a two-digit label number and two decimal places for prices.",
+        "Loop over the completed list in input order."
+      ],
+      "formula": "Print all labels",
+      "pseudocode": "Clean each name\nStore a formatted label\nPrint all labels",
+      "walk": [
+        {
+          "module": 1,
+          "title": "Clean each name",
+          "explanation": "Strip outer spaces and apply title case.",
+          "snippet": "name = input().strip().title()"
+        },
+        {
+          "module": 2,
+          "title": "Store a formatted label",
+          "explanation": "Show a two-digit label number and two decimal places for prices.",
+          "snippet": "labels.append(f\"{number:02d} | {name} | ${price:.2f}\")"
+        },
+        {
+          "module": 3,
+          "title": "Print all labels",
+          "explanation": "Loop over the completed list in input order.",
+          "snippet": "for label in labels:\n    print(label)"
+        }
+      ],
+      "scenarios": [
+        {
+          "title": "Supply list",
+          "values": [
+            " pencils ",
+            "1.5",
+            "notebook",
+            "3",
+            " ruler ",
+            "2.25"
+          ],
+          "inputs": " pencils \n1.5\nnotebook\n3\n ruler \n2.25",
+          "expected": "01 | Pencils | $1.50\n02 | Notebook | $3.00\n03 | Ruler | $2.25"
+        }
+      ],
+      "challenges": [
+        {
+          "title": "Predict the string",
+          "task": "What does the first label look like for tape at 2.5?",
+          "answer": "01 | Tape | $2.50."
+        },
+        {
+          "title": "Extend the label",
+          "task": "How would you show three decimal places?",
+          "answer": "Use :.3f for the price."
+        }
+      ],
+      "code": "labels = []\nfor number in range(1, 4):\n    name = input().strip().title()\n    price = float(input())\n    labels.append(f\"{number:02d} | {name} | ${price:.2f}\")\n\nfor label in labels:\n    print(label)\n"
+    },
+    {
+      "id": "expense_file",
+      "title": "Daily Expense File",
+      "short": "Daily Expense File",
+      "icon": "practice",
+      "file": "expense_file.py",
+      "tag": "Module 11 · File practice",
+      "description": "Save three expenses to a text file, then read them back and calculate the total.",
+      "focus": "Module 11 · File practice",
+      "params": [],
+      "fields": [
+        {
+          "label": "Expense 1",
+          "value": "5.25",
+          "kind": "text",
+          "max": 10000
+        },
+        {
+          "label": "Expense 2",
+          "value": "10",
+          "kind": "text",
+          "max": 10000
+        },
+        {
+          "label": "Expense 3",
+          "value": "4.75",
+          "kind": "text",
+          "max": 10000
+        }
+      ],
+      "rules": [
+        "Write one amount per line in the current working directory.",
+        "Reopen it and convert each text line to a number.",
+        "Format the result to two decimal places."
+      ],
+      "formula": "Display the total",
+      "pseudocode": "Write the file\nRead the file\nDisplay the total",
+      "walk": [
+        {
+          "module": 1,
+          "title": "Write the file",
+          "explanation": "Write one amount per line in the current working directory.",
+          "snippet": "expense_file.write(f\"{expense:.2f}\\n\")"
+        },
+        {
+          "module": 2,
+          "title": "Read the file",
+          "explanation": "Reopen it and convert each text line to a number.",
+          "snippet": "for line in expense_file:\n    total += float(line)"
+        },
+        {
+          "module": 3,
+          "title": "Display the total",
+          "explanation": "Format the result to two decimal places.",
+          "snippet": "print(f\"Total expenses: ${total:.2f}\")"
+        }
+      ],
+      "scenarios": [
+        {
+          "title": "Three expenses",
+          "values": [
+            "5.25",
+            "10",
+            "4.75"
+          ],
+          "inputs": "5.25\n10\n4.75",
+          "expected": "Total expenses: $20.00"
+        },
+        {
+          "title": "Zero expenses",
+          "values": [
+            "0",
+            "0",
+            "0"
+          ],
+          "inputs": "0\n0\n0",
+          "expected": "Total expenses: $0.00"
+        }
+      ],
+      "challenges": [
+        {
+          "title": "Predict the file",
+          "task": "How many lines does the default run write?",
+          "answer": "Three."
+        },
+        {
+          "title": "Predict repeat behavior",
+          "task": "What happens if the program runs again in the same directory?",
+          "answer": "Write mode replaces the previous file contents."
+        }
+      ],
+      "code": "with open(\"expenses.txt\", \"w\", encoding=\"utf-8\") as expense_file:\n    for entry in range(3):\n        expense = float(input())\n        expense_file.write(f\"{expense:.2f}\\n\")\n\ntotal = 0.0\nwith open(\"expenses.txt\", encoding=\"utf-8\") as expense_file:\n    for line in expense_file:\n        total += float(line)\n\nprint(f\"Total expenses: ${total:.2f}\")\n"
+    },
+    {
+      "id": "delivery_estimate",
+      "title": "Delivery Time Estimator",
+      "short": "Delivery Time Estimator",
+      "icon": "practice",
+      "file": "delivery_estimate.py",
+      "tag": "Module 12 · Standard library practice",
+      "description": "Use the math module to calculate how many loads a delivery needs.",
+      "focus": "Module 12 · Standard library practice",
+      "params": [],
+      "fields": [
+        {
+          "label": "Number of boxes",
+          "value": "25",
+          "kind": "text",
+          "max": 10000
+        },
+        {
+          "label": "Boxes per load (positive)",
+          "value": "10",
+          "kind": "text",
+          "max": 10000
+        },
+        {
+          "label": "Minutes per load",
+          "value": "12",
+          "kind": "text",
+          "max": 10000
+        }
+      ],
+      "rules": [
+        "Load the standard-library math module.",
+        "A partially filled load still counts as a full trip.",
+        "Multiply the trip count by the time per trip."
+      ],
+      "formula": "Calculate delivery time",
+      "pseudocode": "Import the helper\nRound up the load count\nCalculate delivery time",
+      "walk": [
+        {
+          "module": 1,
+          "title": "Import the helper",
+          "explanation": "Load the standard-library math module.",
+          "snippet": "import math"
+        },
+        {
+          "module": 2,
+          "title": "Round up the load count",
+          "explanation": "A partially filled load still counts as a full trip.",
+          "snippet": "loads = math.ceil(boxes / capacity)"
+        },
+        {
+          "module": 3,
+          "title": "Calculate delivery time",
+          "explanation": "Multiply the trip count by the time per trip.",
+          "snippet": "print(f\"Estimated minutes: {loads * minutes_per_load}\")"
+        }
+      ],
+      "scenarios": [
+        {
+          "title": "Partial last load",
+          "values": [
+            "25",
+            "10",
+            "12"
+          ],
+          "inputs": "25\n10\n12",
+          "expected": "Loads: 3\nEstimated minutes: 36"
+        },
+        {
+          "title": "Exact capacity",
+          "values": [
+            "20",
+            "10",
+            "12"
+          ],
+          "inputs": "20\n10\n12",
+          "expected": "Loads: 2\nEstimated minutes: 24"
+        }
+      ],
+      "challenges": [
+        {
+          "title": "Predict the trips",
+          "task": "How many loads do 21 boxes need at 10 boxes per load?",
+          "answer": "Three."
+        },
+        {
+          "title": "Try the boundary",
+          "task": "What happens with zero boxes and a positive capacity?",
+          "answer": "The program reports zero loads and zero minutes."
+        }
+      ],
+      "code": "import math\n\nboxes = int(input())\ncapacity = int(input())\nminutes_per_load = int(input())\n\nloads = math.ceil(boxes / capacity)\nprint(f\"Loads: {loads}\")\nprint(f\"Estimated minutes: {loads * minutes_per_load}\")\n"
+    },
+    {
+      "id": "inventory_report",
+      "title": "Inventory Reorder Report",
+      "short": "Inventory Reorder Report",
+      "icon": "practice",
+      "file": "inventory_report.py",
+      "tag": "Module 13 · Cumulative practice",
+      "description": "Count items below a reorder threshold and print a report using a function, list, loop, and condition.",
+      "focus": "Module 13 · Cumulative practice",
+      "params": [],
+      "fields": [
+        {
+          "label": "Reorder threshold",
+          "value": "10",
+          "kind": "text",
+          "max": 10000
+        },
+        {
+          "label": "Pencil stock",
+          "value": "4",
+          "kind": "text",
+          "max": 10000
+        },
+        {
+          "label": "Notebook stock",
+          "value": "18",
+          "kind": "text",
+          "max": 10000
+        },
+        {
+          "label": "Folder stock",
+          "value": "7",
+          "kind": "text",
+          "max": 10000
+        }
+      ],
+      "rules": [
+        "Pair each item name with its quantity.",
+        "A function returns the names whose quantities are below the threshold.",
+        "Count and print the selected items."
+      ],
+      "formula": "Display the result",
+      "pseudocode": "Store related data\nSelect the items\nDisplay the result",
+      "walk": [
+        {
+          "module": 1,
+          "title": "Store related data",
+          "explanation": "Pair each item name with its quantity.",
+          "snippet": "inventory.append((name, int(input())))"
+        },
+        {
+          "module": 2,
+          "title": "Select the items",
+          "explanation": "A function returns the names whose quantities are below the threshold.",
+          "snippet": "if quantity < threshold:\n    low_stock.append(name)"
+        },
+        {
+          "module": 3,
+          "title": "Display the result",
+          "explanation": "Count and print the selected items.",
+          "snippet": "for name in low_stock:\n    print(name)"
+        }
+      ],
+      "scenarios": [
+        {
+          "title": "Two items below threshold",
+          "values": [
+            "10",
+            "4",
+            "18",
+            "7"
+          ],
+          "inputs": "10\n4\n18\n7",
+          "expected": "Items to reorder: 2\nPencils\nFolders"
+        },
+        {
+          "title": "At or above threshold",
+          "values": [
+            "10",
+            "10",
+            "11",
+            "12"
+          ],
+          "inputs": "10\n10\n11\n12",
+          "expected": "Items to reorder: 0"
+        }
+      ],
+      "challenges": [
+        {
+          "title": "Test the boundary",
+          "task": "Should an item with exactly 10 units appear when the threshold is 10?",
+          "answer": "No. The condition is strictly less than 10."
+        },
+        {
+          "title": "Change the rule",
+          "task": "How could you include items exactly at the threshold?",
+          "answer": "Use <= in the comparison."
+        }
+      ],
+      "code": "def reorder_items(inventory, threshold):\n    low_stock = []\n    for name, quantity in inventory:\n        if quantity < threshold:\n            low_stock.append(name)\n    return low_stock\n\n\nthreshold = int(input())\ninventory = []\nfor name in [\"Pencils\", \"Notebooks\", \"Folders\"]:\n    inventory.append((name, int(input())))\n\nlow_stock = reorder_items(inventory, threshold)\nprint(f\"Items to reorder: {len(low_stock)}\")\nfor name in low_stock:\n    print(name)\n"
     }
   ]
 }

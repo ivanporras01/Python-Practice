@@ -3,6 +3,8 @@ import ast
 import contextlib
 import io
 import json
+import os
+from tempfile import TemporaryDirectory
 from pathlib import Path
 from unittest.mock import patch
 
@@ -19,7 +21,13 @@ def run(project, values=None, replacements=None):
     out = io.StringIO()
     scope = {'__name__': '__main__'}
     with patch('builtins.input', lambda *args: next(lines)), contextlib.redirect_stdout(out):
-        exec(compile(code, project['file'], 'exec'), scope)
+        previous_directory = Path.cwd()
+        with TemporaryDirectory() as directory:
+            os.chdir(directory)
+            try:
+                exec(compile(code, project['file'], 'exec'), scope)
+            finally:
+                os.chdir(previous_directory)
     return out.getvalue().strip(), scope
 
 def invoice(project, expected, values=None, replacements=None):
@@ -30,7 +38,23 @@ def invoice(project, expected, values=None, replacements=None):
     checks += 1
     return output, scope
 
-for p in projects:
+checkout_ids = {'cafe', 'cinema', 'bookstore'}
+checkout_projects = [p for p in projects if p['id'] in checkout_ids]
+for project in projects:
+    if project['id'] in checkout_ids:
+        continue
+    assert project['code'] == (ROOT / 'public/capstones' / project['file']).read_text()
+    for scenario in project['scenarios']:
+        assert len(scenario['values']) == len(project['fields'])
+        assert run(project, scenario['values'])[0] == scenario['expected']
+        checks += 1
+sales = next(p for p in projects if p['id'] == 'sales')
+default_sales, _ = run(sales)
+assert len(sales['fields']) == 19
+assert 'Weekly total: $280.00' in default_sales
+assert 'Dept Y | $500.00 | $600.00 | $700.00 | $800.00' in default_sales
+
+for p in checkout_projects:
     assert p['code'] == (ROOT / 'public/capstones' / p['file']).read_text()
     # Keep student examples within the first six modules.
     tree = ast.parse(p['code'])
@@ -60,7 +84,7 @@ for p in projects:
             assert scope['percent_of'](cents, rate) == expected
             checks += 1
 
-cafe, cinema, bookstore = projects
+cafe, cinema, bookstore = checkout_projects
 invoice(cafe, dict(subtotal=2600,discount=260,net=2340,tax=164,tip=351,total=2855))
 invoice(cafe, dict(total=3185,tax=183,tip=392), replacements={'BURGER_PRICE = 850':'BURGER_PRICE = 1000'})
 invoice(cafe, dict(total=3172,discount=0), ['Alex','2','2','1','no','15'])
@@ -83,4 +107,4 @@ invoice(bookstore, dict(total=8523,shipping=500), ['Alex','0','0','2','no','no']
 invoice(bookstore, dict(total=6706,discount=0), ['Alex','2','3','1','no','no'])
 invoice(bookstore, dict(total=6085,discount=580), ['Alex','2','3','1','no','no'], {'member == "yes" and subtotal':'member == "yes" or subtotal'})
 invoice(bookstore, dict(total=0,shipping=0), ['Alex','0','0','0','yes','no'])
-print(f'{checks} capstone checks passed: 3 projects, 13 reference scenarios, challenges, validation, boundaries, and exact cent rounding.')
+print(f"{checks} capstone checks passed: {len(projects)} projects, {sum(len(p['scenarios']) for p in projects)} reference scenarios, challenges, validation, boundaries, and exact cent rounding.")

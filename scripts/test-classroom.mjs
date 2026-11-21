@@ -89,7 +89,7 @@ for(const p of capstones.projects.slice(1)){
  const w={...work,code:p.code,inputs:p.scenarios[0].inputs,lastRun:null,runIds:[]};
  await request({...save,projectId:p.id,id:randomUUID(),work:w},a.token);
 }
-assert.equal((await request(undefined,a.token,'/api/classroom?capstones=1')).records.length,3);
+assert.equal((await request(undefined,a.token,'/api/classroom?capstones=1')).records.length,capstones.projects.length);
 await request(undefined,a.token,undefined,403,'https://example.com');
 await request({...makeAttempt(true),code:'x'.repeat(20001)},a.token,undefined,400);
 await request({action:'remove-student',studentId:alice.id},a.token,undefined,403);
@@ -102,4 +102,4 @@ const cleanup=(await request(undefined,teacher)).roster;
 for(const student of cleanup) await request({action:'remove-student',studentId:student.id},teacher);
 await request({action:'teacher-logout'},teacher);
 assert.equal((await request(undefined,teacher)).isInstructor,false);
-console.log('PASS: signed teacher login; replay rejection; wrong signature rejection; teacher logout; name-only joining; separate students; returning-student identity; concurrent retry deduplication; progress totals; completion retention; presence; private dashboard; code history; invalid requests; CORS; Capstone autosave/reopen; idempotent retries; revision conflicts; student isolation; all three projects; submission snapshots; milestone tracking; deletion cleanup.');
+console.log('PASS: signed teacher login; replay rejection; wrong signature rejection; teacher logout; name-only joining; separate students; returning-student identity; concurrent retry deduplication; progress totals; completion retention; presence; private dashboard; code history; invalid requests; CORS; Capstone autosave/reopen; idempotent retries; revision conflicts; student isolation; all projects; submission snapshots; milestone tracking; deletion cleanup.');

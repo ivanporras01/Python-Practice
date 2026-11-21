@@ -42,9 +42,9 @@ All 114 reference solutions were run against their expected output and Python as
 
 An empty `apiBase` preserves the original GitHub Pages practice behavior: progress stays in the student's browser and can be downloaded as CSV. Shared class monitoring is enabled only after a real Cloudflare API URL is configured. Existing local practice data is preserved separately and is not silently assigned to a new classroom identity.
 
-## Capstone Projects (Modules 1–6 practice)
+## Capstone Projects
 
-Open **Capstone Projects** from the sidebar or the learning-path callout. Direct entry: `?view=capstones`; add `&project=cafe`, `&project=cinema`, or `&project=bookstore` to select an example.
+Open **Capstone Projects** from the sidebar or the learning-path callout. Direct entry: `?view=capstones`; add `&project=cafe`, `&project=cinema`, , `&project=bookstore`, or `&project=sales` to select an example.
 
 Three original examples combine computational thinking, variables/input/expressions, strings, decisions, repetition, and functions: **Campus Café Checkout**, **Movie Ticket Kiosk**, and **Campus Bookstore Checkout**. This working alignment follows the saved course outline; the source outline predates the Fall 2026 section, so section-specific Canvas titles should be confirmed separately. Collections, classes, and file handling are not prerequisites.
 
